@@ -104,13 +104,20 @@ matrix fast_mat_mul(matrix matrix_a, matrix matrix_b) {
 	split_matrix(matrix_a, a00, a01, a10, a11);
 	split_matrix(matrix_b, b00, b01, b10, b11);
 
-	matrix p(fast_mat_mul(a00, add_matrix(b01, b11, -1)));
-	matrix q(fast_mat_mul(add_matrix(a00, a01), b11));
-	matrix r(fast_mat_mul(add_matrix(a10, a11), b00));
-	matrix s(fast_mat_mul(a11, add_matrix(b10, b00, -1)));
-	matrix t(fast_mat_mul(add_matrix(a00, a11), add_matrix(b00, b11)));
-	matrix u(fast_mat_mul(add_matrix(a01, a11, -1), add_matrix(b10, b11, -1)));
-	matrix v(fast_mat_mul(add_matrix(a00, a10, -1), add_matrix(b00, b01)));
+	matrix p(fast_mat_mul(a00,
+						  add_matrix(b01, b11, -1)));
+	matrix q(fast_mat_mul(add_matrix(a00, a01),
+						  b11));
+	matrix r(fast_mat_mul(add_matrix(a10, a11),
+						  b00));
+	matrix s(fast_mat_mul(a11,
+						  add_matrix(b10, b00, -1)));
+	matrix t(fast_mat_mul(add_matrix(a00, a11),
+						  add_matrix(b00, b11)));
+	matrix u(fast_mat_mul(add_matrix(a01, a11, -1),
+						  add_matrix(b10, b11)));
+	matrix v(fast_mat_mul(add_matrix(a00, a10, -1),
+						  add_matrix(b00, b01)));
 
 	matrix result_matrix_00(add_matrix(add_matrix(add_matrix(t, s), u), q, -1));
 	matrix result_matrix_01(add_matrix(p, q));
