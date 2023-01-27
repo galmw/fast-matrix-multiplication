@@ -9,11 +9,11 @@
 typedef std::vector<int> row;
 typedef std::vector<row> matrix;
 
-matrix standardMatMul(matrix mat1, matrix mat2);
+matrix standard_mat_mul(matrix mat1, matrix mat2);
 
-void print_matrix(std::string display, matrix matrix,
-		int start_row, int start_column, int end_row,
-		int end_column);
+matrix fast_mat_mul(matrix mat1, matrix mat2);
+
+void print_matrix(matrix matrix);
 
 // end of header guard
 #endif

@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "functions.h"
 
-matrix standardMatMul(matrix mat_a, matrix mat_b) {
+matrix standard_mat_mul(matrix mat_a, matrix mat_b) {
     matrix result(mat_a.size());
     for (int i = 0; i < mat_a.size(); i++) {
 		result[i] = row(mat_b[0].size());
@@ -16,49 +16,15 @@ matrix standardMatMul(matrix mat_a, matrix mat_b) {
 	return result;
 }
 
-int basic[4][4] = {{1, 0, 0, 0},
-                            {0, 1, -1, 1},
-                            {0, 0, -1, 1},
-                            {0, 1, 0, 1}};
-
-// this function generates a random matrix of size n x n
-/* void generateMatrix(int n, int matrix[n][n]) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            matrix[i][j] = rand() % 10;
-        }
-    }
-} */
-
-void alt_base_mat_mul(int a[2][2], int b[2][2], int result[2][2]) {
-    int a11 = a[0][0];
-    int a12 = a[0][1];
-    int a21 = a[1][0];
-    int a22 = a[1][1];
-    int b11 = b[0][0];
-    int b12 = b[0][1];
-    int b21 = b[1][0];
-    int b22 = b[1][1];
-    int p1 = a11 * (b12 - b22);
-    int p2 = (a11 + a12) * b22;
-    int p3 = (a21 + a22) * b11;
-    int p4 = a22 * (b21 - b11);
-    int p5 = (a11 + a22) * (b11 + b22);
-    int p6 = (a12 - a22) * (b21 + b22);
-    int p7 = (a11 - a21) * (b11 + b12);
-    result[0][0] = p5 + p4 - p2 + p6;
-    result[0][1] = p1 + p2;
-    result[1][0] = p3 + p4;
-    result[1][1] = p1 + p5 - p3 - p7;
-}
+int basic[4][4] = { {1, 0, 0, 0},
+					{0, 1, -1, 1},
+					{0, 0, -1, 1},
+					{0, 1, 0, 1} };
 
 
-void print_matrix(std::string display, matrix matrix,
-		int start_row, int start_column, int end_row,
-		int end_column) {
-	std::cout << std::endl << display << std::endl;
-	for (int i = start_row; i <= end_row; i++) {
-		for (int j = start_column; j <= end_column; j++) {
+void print_matrix(matrix matrix) {
+	for (auto i = 0; i < matrix.size(); i++) {
+		for (auto j = 0; j < matrix[0].size(); j++) {
             std::cout << std::setw(10);
             std::cout << matrix[i][j];
 		}
@@ -68,14 +34,14 @@ void print_matrix(std::string display, matrix matrix,
 	return;
 }
 
-matrix add_matrix(matrix matrix_A, matrix matrix_B, int split_index, int multiplier = 1) {
-	for (auto i = 0; i < split_index; i++)
-		for (auto j = 0; j < split_index; j++)
+matrix add_matrix(matrix matrix_A, matrix matrix_B, int size, int multiplier = 1) {
+	for (auto i = 0; i < size; i++)
+		for (auto j = 0; j < size; j++)
 			matrix_A[i][j] = matrix_A[i][j] + (multiplier * matrix_B[i][j]);
 	return matrix_A;
 }
 
-matrix multiply_matrix(matrix matrix_A, matrix matrix_B) {
+matrix fast_mat_mul(matrix matrix_A, matrix matrix_B) {
 	int col_1 = matrix_A[0].size();
 	int row_1 = matrix_A.size();
 	int col_2 = matrix_B[0].size();
@@ -109,6 +75,7 @@ matrix multiply_matrix(matrix matrix_A, matrix matrix_B) {
 		matrix b10(split_index, row_vector);
 		matrix b11(split_index, row_vector);
 
+		// Splitting matrices A and B into 4 sub-matrices
 		for (auto i = 0; i < split_index; i++)
 			for (auto j = 0; j < split_index; j++) {
 				a00[i][j] = matrix_A[i][j];
@@ -123,48 +90,26 @@ matrix multiply_matrix(matrix matrix_A, matrix matrix_B) {
 									[j + split_index];
 			}
 
-		matrix p(multiply_matrix(
-			a00, add_matrix(b01, b11, split_index, -1)));
-		matrix q(multiply_matrix(
-			add_matrix(a00, a01, split_index), b11));
-		matrix r(multiply_matrix(
-			add_matrix(a10, a11, split_index), b00));
-		matrix s(multiply_matrix(
-			a11, add_matrix(b10, b00, split_index, -1)));
-		matrix t(multiply_matrix(
-			add_matrix(a00, a11, split_index),
-			add_matrix(b00, b11, split_index)));
-		matrix u(multiply_matrix(
-			add_matrix(a01, a11, split_index, -1),
-			add_matrix(b10, b11, split_index)));
-		matrix v(multiply_matrix(
-			add_matrix(a00, a10, split_index, -1),
-			add_matrix(b00, b01, split_index)));
+		matrix p(fast_mat_mul(a00, add_matrix(b01, b11, split_index, -1)));
+		matrix q(fast_mat_mul(add_matrix(a00, a01, split_index), b11));
+		matrix r(fast_mat_mul(add_matrix(a10, a11, split_index), b00));
+		matrix s(fast_mat_mul(a11, add_matrix(b10, b00, split_index, -1)));
+		matrix t(fast_mat_mul(add_matrix(a00, a11, split_index), add_matrix(b00, b11, split_index)));
+		matrix u(fast_mat_mul(add_matrix(a01, a11, split_index, -1), add_matrix(b10, b11, split_index)));
+		matrix v(fast_mat_mul(add_matrix(a00, a10, split_index, -1), add_matrix(b00, b01, split_index)));
 
-		matrix result_matrix_00(add_matrix(
-			add_matrix(add_matrix(t, s, split_index), u,
-					split_index),
-			q, split_index, -1));
-		matrix result_matrix_01(
-			add_matrix(p, q, split_index));
-		matrix result_matrix_10(
-			add_matrix(r, s, split_index));
-		matrix result_matrix_11(add_matrix(
-			add_matrix(add_matrix(t, p, split_index), r,
-					split_index, -1),
-			v, split_index, -1));
+		matrix result_matrix_00(add_matrix(add_matrix(add_matrix(t, s, split_index), u, split_index), q, split_index, -1));
+		matrix result_matrix_01(add_matrix(p, q, split_index));
+		matrix result_matrix_10(add_matrix(r, s, split_index));
+		matrix result_matrix_11(add_matrix(add_matrix(add_matrix(t, p, split_index), r, split_index, -1), v, split_index, -1));
 
+		// Fill the result matrix with the sub-matrices
 		for (auto i = 0; i < split_index; i++)
 			for (auto j = 0; j < split_index; j++) {
-				result_matrix[i][j]
-					= result_matrix_00[i][j];
-				result_matrix[i][j + split_index]
-					= result_matrix_01[i][j];
-				result_matrix[split_index + i][j]
-					= result_matrix_10[i][j];
-				result_matrix[i + split_index]
-							[j + split_index]
-					= result_matrix_11[i][j];
+				result_matrix[i][j] = result_matrix_00[i][j];
+				result_matrix[i][j + split_index] = result_matrix_01[i][j];
+				result_matrix[split_index + i][j] = result_matrix_10[i][j];
+				result_matrix[i + split_index][j + split_index] = result_matrix_11[i][j];
 			}
 
 		a00.clear();
@@ -191,13 +136,8 @@ matrix multiply_matrix(matrix matrix_A, matrix matrix_B) {
 }
 
 
-
-// Time Complexity: T(N) = 7T(N/2) + O(N^2) => O(N^Log7)
-// which is approximately O(N^2.8074) Code Contributed By:
-// lucasletum
-
 /*
-void fast_mat_mul(int [][] a, int [][] b, int [][] c) {
+void faster_mat_mul(int [][] a, int [][] b, int [][] c) {
     base_transer(a, a_tilda);
     base_transer(b, b_tilda);
     base_transer(c, c_tilda);
