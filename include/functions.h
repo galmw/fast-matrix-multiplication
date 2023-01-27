@@ -1,11 +1,19 @@
+// header guard
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
+
 #include <iostream>
+#include <vector>
+#include <string>
 
-const int C1 = 2;
-const int C2 = 2;
-const int R1 = 2;
-const int R2 = 2;
+typedef std::vector<int> row;
+typedef std::vector<row> matrix;
 
+matrix standardMatMul(matrix mat1, matrix mat2);
 
-void fastMatMul(int m1[2][2], int m2[2][2], int result[2][2]);
+void print_matrix(std::string display, matrix matrix,
+		int start_row, int start_column, int end_row,
+		int end_column);
 
-void standardMatMul(int mat1[][C1], int mat2[][C2]);
+// end of header guard
+#endif
