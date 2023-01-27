@@ -16,12 +16,6 @@ matrix standard_mat_mul(matrix mat_a, matrix mat_b) {
 	return result;
 }
 
-int basic[4][4] = { {1, 0, 0, 0},
-					{0, 1, -1, 1},
-					{0, 0, -1, 1},
-					{0, 1, 0, 1} };
-
-
 void print_matrix(matrix matrix) {
 	for (auto i = 0; i < matrix.size(); i++) {
 		for (auto j = 0; j < matrix[0].size(); j++) {
@@ -34,18 +28,50 @@ void print_matrix(matrix matrix) {
 	return;
 }
 
-matrix add_matrix(matrix matrix_A, matrix matrix_B, int size, int multiplier = 1) {
+matrix add_matrix(matrix matrix_a, matrix matrix_b, int multiplier = 1) {
+	int size = matrix_a.size();
 	for (auto i = 0; i < size; i++)
 		for (auto j = 0; j < size; j++)
-			matrix_A[i][j] = matrix_A[i][j] + (multiplier * matrix_B[i][j]);
-	return matrix_A;
+			matrix_a[i][j] = matrix_a[i][j] + (multiplier * matrix_b[i][j]);
+	return matrix_a;
 }
 
-matrix fast_mat_mul(matrix matrix_A, matrix matrix_B) {
-	int col_1 = matrix_A[0].size();
-	int row_1 = matrix_A.size();
-	int col_2 = matrix_B[0].size();
-	int row_2 = matrix_B.size();
+// this function receives a matrix and splits it into 4 sub-matrices: a00, a01, a10, a11
+void split_matrix(matrix mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11) {
+	int size = mat[0].size() / 2;
+
+	for (auto i = 0; i < size; i++) {
+		for (auto j = 0; j < size; j++) {
+			a00[i][j] = mat[i][j];
+			a01[i][j] = mat[i][j + size];
+			a10[i][j] = mat[i + size][j];
+			a11[i][j] = mat[i + size][j + size];
+		}
+	}
+}
+
+// using this as reference: https://www.geeksforgeeks.org/strassens-matrix-multiplication/
+
+// this function recieves a matrix and returns 4 sub-matrices, after a base transfer
+void split_matrix_and_base_transfer(matrix mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11) {
+	int size = mat.size() / 2;
+
+	for (auto i = 0; i < size; i++) {
+		for (auto j = 0; j < size; j++) {
+			a00[i][j] = mat[i][j];
+			a01[i][j] = mat[i][j + size] - mat[i + size][j] + mat[i + size][j + size];
+			a10[i][j] = mat[i + size][j] - mat[i + size][j + size];
+			a11[i][j] = mat[i][j + size] + mat[i + size][j + size];
+		}
+	}
+}
+
+
+matrix fast_mat_mul(matrix matrix_a, matrix matrix_b) {
+	int col_1 = matrix_a[0].size();
+	int row_1 = matrix_a.size();
+	int col_2 = matrix_b[0].size();
+	int row_2 = matrix_b.size();
 
 	if (col_1 != row_2) {
 		std::cout << "\nError: The number of columns in Matrix "
@@ -55,92 +81,127 @@ matrix fast_mat_mul(matrix matrix_A, matrix matrix_B) {
 	}
 
 	row result_matrix_row(col_2, 0);
-	matrix result_matrix(row_1,
-									result_matrix_row);
+	matrix result_matrix(row_1, result_matrix_row);
 
-	if (col_1 == 1)
-		result_matrix[0][0]
-			= matrix_A[0][0] * matrix_B[0][0];
-	else {
-		int split_index = col_1 / 2;
-
-		row row_vector(split_index, 0);
-
-		matrix a00(split_index, row_vector);
-		matrix a01(split_index, row_vector);
-		matrix a10(split_index, row_vector);
-		matrix a11(split_index, row_vector);
-		matrix b00(split_index, row_vector);
-		matrix b01(split_index, row_vector);
-		matrix b10(split_index, row_vector);
-		matrix b11(split_index, row_vector);
-
-		// Splitting matrices A and B into 4 sub-matrices
-		for (auto i = 0; i < split_index; i++)
-			for (auto j = 0; j < split_index; j++) {
-				a00[i][j] = matrix_A[i][j];
-				a01[i][j] = matrix_A[i][j + split_index];
-				a10[i][j] = matrix_A[split_index + i][j];
-				a11[i][j] = matrix_A[i + split_index]
-									[j + split_index];
-				b00[i][j] = matrix_B[i][j];
-				b01[i][j] = matrix_B[i][j + split_index];
-				b10[i][j] = matrix_B[split_index + i][j];
-				b11[i][j] = matrix_B[i + split_index]
-									[j + split_index];
-			}
-
-		matrix p(fast_mat_mul(a00, add_matrix(b01, b11, split_index, -1)));
-		matrix q(fast_mat_mul(add_matrix(a00, a01, split_index), b11));
-		matrix r(fast_mat_mul(add_matrix(a10, a11, split_index), b00));
-		matrix s(fast_mat_mul(a11, add_matrix(b10, b00, split_index, -1)));
-		matrix t(fast_mat_mul(add_matrix(a00, a11, split_index), add_matrix(b00, b11, split_index)));
-		matrix u(fast_mat_mul(add_matrix(a01, a11, split_index, -1), add_matrix(b10, b11, split_index)));
-		matrix v(fast_mat_mul(add_matrix(a00, a10, split_index, -1), add_matrix(b00, b01, split_index)));
-
-		matrix result_matrix_00(add_matrix(add_matrix(add_matrix(t, s, split_index), u, split_index), q, split_index, -1));
-		matrix result_matrix_01(add_matrix(p, q, split_index));
-		matrix result_matrix_10(add_matrix(r, s, split_index));
-		matrix result_matrix_11(add_matrix(add_matrix(add_matrix(t, p, split_index), r, split_index, -1), v, split_index, -1));
-
-		// Fill the result matrix with the sub-matrices
-		for (auto i = 0; i < split_index; i++)
-			for (auto j = 0; j < split_index; j++) {
-				result_matrix[i][j] = result_matrix_00[i][j];
-				result_matrix[i][j + split_index] = result_matrix_01[i][j];
-				result_matrix[split_index + i][j] = result_matrix_10[i][j];
-				result_matrix[i + split_index][j + split_index] = result_matrix_11[i][j];
-			}
-
-		a00.clear();
-		a01.clear();
-		a10.clear();
-		a11.clear();
-		b00.clear();
-		b01.clear();
-		b10.clear();
-		b11.clear();
-		p.clear();
-		q.clear();
-		r.clear();
-		s.clear();
-		t.clear();
-		u.clear();
-		v.clear();
-		result_matrix_00.clear();
-		result_matrix_01.clear();
-		result_matrix_10.clear();
-		result_matrix_11.clear();
+	if (col_1 == 1) {
+		result_matrix[0][0] = matrix_a[0][0] * matrix_b[0][0];
+		return result_matrix;
 	}
+	int split_index = col_1 / 2;
+
+	row row_vector(split_index, 0);
+
+	matrix a00(split_index, row_vector);
+	matrix a01(split_index, row_vector);
+	matrix a10(split_index, row_vector);
+	matrix a11(split_index, row_vector);
+	matrix b00(split_index, row_vector);
+	matrix b01(split_index, row_vector);
+	matrix b10(split_index, row_vector);
+	matrix b11(split_index, row_vector);
+
+	// Splitting matrices A and B into 4 sub-matrices
+	split_matrix(matrix_a, a00, a01, a10, a11);
+	split_matrix(matrix_b, b00, b01, b10, b11);
+
+	matrix p(fast_mat_mul(a00, add_matrix(b01, b11, -1)));
+	matrix q(fast_mat_mul(add_matrix(a00, a01), b11));
+	matrix r(fast_mat_mul(add_matrix(a10, a11), b00));
+	matrix s(fast_mat_mul(a11, add_matrix(b10, b00, -1)));
+	matrix t(fast_mat_mul(add_matrix(a00, a11), add_matrix(b00, b11)));
+	matrix u(fast_mat_mul(add_matrix(a01, a11, -1), add_matrix(b10, b11, -1)));
+	matrix v(fast_mat_mul(add_matrix(a00, a10, -1), add_matrix(b00, b01)));
+
+	matrix result_matrix_00(add_matrix(add_matrix(add_matrix(t, s), u), q, -1));
+	matrix result_matrix_01(add_matrix(p, q));
+	matrix result_matrix_10(add_matrix(r, s));
+	matrix result_matrix_11(add_matrix(add_matrix(add_matrix(t, p), r, -1), v, -1));
+
+	// Fill the result matrix with the sub-matrices
+	for (auto i = 0; i < split_index; i++)
+		for (auto j = 0; j < split_index; j++) {
+			result_matrix[i][j] = result_matrix_00[i][j];
+			result_matrix[i][j + split_index] = result_matrix_01[i][j];
+			result_matrix[split_index + i][j] = result_matrix_10[i][j];
+			result_matrix[i + split_index][j + split_index] = result_matrix_11[i][j];
+		}
+
+	a00.clear();
+	a01.clear();
+	a10.clear();
+	a11.clear();
+	b00.clear();
+	b01.clear();
+	b10.clear();
+	b11.clear();
+	p.clear();
+	q.clear();
+	r.clear();
+	s.clear();
+	t.clear();
+	u.clear();
+	v.clear();
+	result_matrix_00.clear();
+	result_matrix_01.clear();
+	result_matrix_10.clear();
+	result_matrix_11.clear();
 	return result_matrix;
 }
 
 
-/*
-void faster_mat_mul(int [][] a, int [][] b, int [][] c) {
-    base_transer(a, a_tilda);
-    base_transer(b, b_tilda);
-    base_transer(c, c_tilda);
-    reverse_base_transer(c_tilda, c);
+matrix faster_mat_mul(matrix matrix_a, matrix matrix_b) {
+	int col_1 = matrix_a[0].size();
+	int row_1 = matrix_a.size();
+	int col_2 = matrix_b[0].size();
+	int row_2 = matrix_b.size();
 
-} */
+	if (col_1 != row_2) {
+		std::cout << "\nError: The number of columns in Matrix "
+				"A must be equal to the number of rows in "
+				"Matrix B\n";
+		return {};
+	}
+
+	row result_matrix_row(col_2, 0);
+	matrix result_matrix(row_1, result_matrix_row);
+
+	if (col_1 == 1) {
+		result_matrix[0][0] = matrix_a[0][0] * matrix_b[0][0];
+		return result_matrix;
+	}
+
+	int split_index = col_1 / 2;
+
+	row row_vector(split_index, 0);
+
+	matrix a00(split_index, row_vector);
+	matrix a01(split_index, row_vector);
+	matrix a10(split_index, row_vector);
+	matrix a11(split_index, row_vector);
+	matrix b00(split_index, row_vector);
+	matrix b01(split_index, row_vector);
+	matrix b10(split_index, row_vector);
+	matrix b11(split_index, row_vector);
+
+	// Splitting matrices A and B into 4 sub-matrices with a base transfer
+	split_matrix_and_base_transfer(matrix_a, a00, a01, a10, a11);
+	split_matrix_and_base_transfer(matrix_b, b00, b01, b10, b11);	
+
+	// using faster_mat_mul instead of fast.
+	matrix m1(faster_mat_mul(a11, b11));
+	matrix m2(faster_mat_mul(a10, b10));
+	matrix m3(faster_mat_mul(a01, b01));
+	matrix m4(faster_mat_mul(a00, b00));
+	matrix m5(faster_mat_mul(add_matrix(a01, a10, -1), add_matrix(b11, b01, -1)));
+	matrix m6(faster_mat_mul(add_matrix(a01, a00, -1), add_matrix(b01, b10, -1)));
+	matrix m7(faster_mat_mul(add_matrix(a00, a10, -1), add_matrix(b00, b01, 00))); 
+
+	matrix result_matrix_00(add_matrix(add_matrix(add_matrix(m5, m4), m6), m2, -1));
+	matrix result_matrix_01(add_matrix(m1, m2));
+	matrix result_matrix_10(add_matrix(m3, m4));
+	matrix result_matrix_11(add_matrix(add_matrix(add_matrix(m5, m1), m3, -1), m7, -1));
+
+	// return to standard base
+	// result_matrix = reverse_base_transfer(result_matrix);
+	return result_matrix;
+}
