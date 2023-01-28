@@ -5,10 +5,18 @@
 #include "functions.h"
 using namespace std;
 
-int main()
-{
-	std::cout << "Starting" << std::endl;
+// this function receives a matrix, an algorithm, and a pointer to a time variable and return the output matrix
+matrix run_algorithm(matrix mat_a, matrix mat_b, matrix (*algorithm)(matrix, matrix), double *time) {
 	time_t start, end;
+	start = clock();
+	matrix result = algorithm(mat_a, mat_b);
+	end = clock();
+	*time = double(end - start) / double(CLOCKS_PER_SEC);
+	return result;
+}
+
+int main() {
+	std::cout << "Starting" << std::endl;
 	double time_taken;
 	int num_iterations = 8;
 	vector<double> standard_times;
@@ -21,18 +29,12 @@ int main()
 		matrix matrix_b = random_matrix(2 << i, 2 << i);
 		// measure the time of the standard matrix multiplication
 		
-		start = clock();
-		matrix result_standard = standard_mat_mul(matrix_a, matrix_b);
-		end = clock();
-		time_taken = double(end - start) / double(CLOCKS_PER_SEC);
+		matrix result_standard = run_algorithm(matrix_a, matrix_b, standard_mat_mul, &time_taken);
 		standard_times.push_back(time_taken);
-		
-		start = clock();
-		matrix result_faster = faster_mat_mul(matrix_a, matrix_b);
-		end = clock();
-		time_taken = double(end - start) / double(CLOCKS_PER_SEC);
+
+		matrix result_faster = run_algorithm(matrix_a, matrix_b, faster_mat_mul, &time_taken);
 		faster_times.push_back(time_taken);
-	
+
 		if (!equal_matrix(result_standard, result_faster)) {
 			std::cout << "Something went wrong - The results are not equal" << std::endl;
 		}
