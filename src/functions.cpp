@@ -37,7 +37,7 @@ matrix add_matrix(matrix matrix_a, matrix matrix_b, int multiplier = 1) {
 }
 
 // this function receives a matrix and splits it into 4 sub-matrices: a00, a01, a10, a11
-void split_matrix(matrix mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11) {
+void split_matrix(matrix &mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11) {
 	int size = mat[0].size() / 2;
 
 	for (auto i = 0; i < size; i++) {
@@ -51,7 +51,7 @@ void split_matrix(matrix mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11
 }
 
 // this function recieves a matrix and returns 4 sub-matrices, after a base transfer
-void split_matrix_and_base_transfer(matrix mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11) {
+void split_matrix_and_base_transfer(matrix &mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11) {
 	int size = mat.size() / 2;
 
 	for (auto i = 0; i < size; i++) {
@@ -65,11 +65,11 @@ void split_matrix_and_base_transfer(matrix mat, matrix &a00, matrix &a01, matrix
 }
 
 // this function recieves 4 sub-matrices and returns a matrix after a reverse base transfer
-matrix merge_matrix_and_reverse_base_transfer(matrix a00, matrix a01, matrix a10, matrix a11) {
+void merge_matrix_and_reverse_base_transfer(matrix &result,
+		const matrix &a00, const matrix &a01, const matrix &a10, const matrix &a11) {
 	int size = a00.size();
-	matrix result(size * 2, row(size * 2, 0));
 
-	// Fill the result matrix with the sub-matrices
+	// Fill the result matrix with the sub-matrices with a base transfer
 	for (auto i = 0; i < size; i++) {
 		for (auto j = 0; j < size; j++) {
 			result[i][j] = a00[i][j];
@@ -78,7 +78,6 @@ matrix merge_matrix_and_reverse_base_transfer(matrix a00, matrix a01, matrix a10
 			result[i + size][j + size] = a10[i][j] - a01[i][j] + a11[i][j];
 		}
 	}
-	return result;
 }
 
 // this function recieves 4 sub-matrices and returns a matrix
@@ -155,7 +154,6 @@ matrix fast_mat_mul(matrix matrix_a, matrix matrix_b) {
 	matrix result_matrix_10(add_matrix(r, s));
 	matrix result_matrix_11(add_matrix(add_matrix(add_matrix(t, p), r, -1), v, -1));
 
-
 	// Fill the result matrix with the sub-matrices
 	merge_matrix(result_matrix, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
 
@@ -229,12 +227,12 @@ matrix faster_mat_mul(matrix matrix_a, matrix matrix_b) {
 	matrix m6(faster_mat_mul(add_matrix(a01, a00, -1), add_matrix(b01, b10, -1)));
 	matrix m7(faster_mat_mul(add_matrix(a11, a01, -1), add_matrix(b01, b00, -1))); 
 
-	matrix result_matrix_00(add_matrix(m3, m4));
+	matrix result_matrix_00(add_matrix(m4, m5));
 	matrix result_matrix_01(add_matrix(add_matrix(add_matrix(m3, m5), m6, -1), m7));
 	matrix result_matrix_10(add_matrix(m2, m7));
 	matrix result_matrix_11(add_matrix(m1, m6, -1));
 
 	// return to standard base
-	result_matrix = merge_matrix_and_reverse_base_transfer(result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
+	merge_matrix_and_reverse_base_transfer(result_matrix, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
 	return result_matrix;
 }
