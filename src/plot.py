@@ -18,6 +18,7 @@ def plot_points(points):
     fast = [p[2] for p in points]
     plt.plot(n, standard, 'ro')
     plt.plot(n, fast, 'bo')
+    plt.yscale('log')
     plt.show()
 
 
