@@ -16,7 +16,7 @@ matrix standard_mat_mul(matrix mat_a, matrix mat_b) {
 	return result;
 }
 
-void print_matrix(matrix matrix) {
+void print_matrix(matrix &matrix) {
 	for (auto i = 0; i < matrix.size(); i++) {
 		for (auto j = 0; j < matrix[0].size(); j++) {
             std::cout << std::setw(10);
@@ -95,8 +95,7 @@ void merge_matrix(matrix &result, const matrix &a00, const matrix &a01, const ma
 	}
 }
 
-// using this as reference: https://www.geeksforgeeks.org/strassens-matrix-multiplication/
-
+// this function multiplies 2 matrices using the Strassen algorithm
 matrix fast_mat_mul(matrix matrix_a, matrix matrix_b) {
 	int col_1 = matrix_a[0].size();
 	int row_1 = matrix_a.size();
@@ -156,30 +155,10 @@ matrix fast_mat_mul(matrix matrix_a, matrix matrix_b) {
 
 	// Fill the result matrix with the sub-matrices
 	merge_matrix(result_matrix, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
-
-	a00.clear();
-	a01.clear();
-	a10.clear();
-	a11.clear();
-	b00.clear();
-	b01.clear();
-	b10.clear();
-	b11.clear();
-	p.clear();
-	q.clear();
-	r.clear();
-	s.clear();
-	t.clear();
-	u.clear();
-	v.clear();
-	result_matrix_00.clear();
-	result_matrix_01.clear();
-	result_matrix_10.clear();
-	result_matrix_11.clear();
 	return result_matrix;
 }
 
-
+// this function multiplies 2 matrices using the fast alternative basis matrix algorithm
 matrix faster_mat_mul(matrix matrix_a, matrix matrix_b) {
 	int col_1 = matrix_a[0].size();
 	int row_1 = matrix_a.size();
@@ -235,4 +214,37 @@ matrix faster_mat_mul(matrix matrix_a, matrix matrix_b) {
 	// return to standard base
 	merge_matrix_and_reverse_base_transfer(result_matrix, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
 	return result_matrix;
+}
+
+// this function returns a random matrix with the given size
+matrix random_matrix(int m, int n) {
+	matrix result(m, row(n, 0));
+
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			result[i][j] = arc4random() % 10;
+		}
+	}
+	return result;
+}
+
+// this function receives two matrices and returns true iff they are equal
+bool equal_matrix(matrix matrix_a, matrix matrix_b) {
+	int col_1 = matrix_a[0].size();
+	int row_1 = matrix_a.size();
+	int col_2 = matrix_b[0].size();
+	int row_2 = matrix_b.size();
+
+	if (col_1 != col_2 || row_1 != row_2) {
+		return false;
+	}
+
+	for (int i = 0; i < row_1; i++) {
+		for (int j = 0; j < col_1; j++) {
+			if (matrix_a[i][j] != matrix_b[i][j]) {
+				return false;
+			}
+		}
+	}
+	return true;
 }

@@ -15,7 +15,11 @@ matrix fast_mat_mul(matrix mat1, matrix mat2);
 
 matrix faster_mat_mul(matrix mat1, matrix mat2);
 
-void print_matrix(matrix matrix);
+matrix random_matrix(int m, int n);
+
+void print_matrix(matrix &matrix);
+
+bool equal_matrix(matrix matrix_a, matrix matrix_b);
 
 // end of header guard
 #endif
