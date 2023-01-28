@@ -13,6 +13,8 @@ matrix standard_mat_mul(matrix mat1, matrix mat2);
 
 matrix fast_mat_mul(matrix mat1, matrix mat2);
 
+matrix faster_mat_mul(matrix mat1, matrix mat2);
+
 void print_matrix(matrix matrix);
 
 // end of header guard
