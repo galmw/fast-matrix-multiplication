@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "functions.h"
 
-matrix standard_mat_mul(matrix mat_a, matrix mat_b) {
+matrix standard_mat_mul(const matrix &mat_a, const matrix &mat_b) {
     matrix result(mat_a.size());
     for (int i = 0; i < mat_a.size(); i++) {
 		result[i] = row(mat_b[0].size());
@@ -16,7 +16,7 @@ matrix standard_mat_mul(matrix mat_a, matrix mat_b) {
 	return result;
 }
 
-void print_matrix(matrix &matrix) {
+void print_matrix(const matrix &matrix) {
 	for (auto i = 0; i < matrix.size(); i++) {
 		for (auto j = 0; j < matrix[0].size(); j++) {
             std::cout << std::setw(10);
@@ -99,7 +99,7 @@ void merge_matrix(matrix &result, const matrix &a00, const matrix &a01, const ma
 }
 
 // this function multiplies 2 matrices using the Strassen algorithm
-matrix fast_mat_mul(matrix matrix_a, matrix matrix_b) {
+matrix fast_mat_mul(const matrix &matrix_a, const matrix &matrix_b) {
 	int col_1 = matrix_a[0].size();
 	int row_1 = matrix_a.size();
 	int col_2 = matrix_b[0].size();
@@ -137,25 +137,25 @@ matrix fast_mat_mul(matrix matrix_a, matrix matrix_b) {
 	split_matrix(matrix_a, a00, a01, a10, a11);
 	split_matrix(matrix_b, b00, b01, b10, b11);
 
-	matrix p(fast_mat_mul(a00,
-						  add_matrix(b01, b11, -1)));
-	matrix q(fast_mat_mul(add_matrix(a00, a01),
-						  b11));
-	matrix r(fast_mat_mul(add_matrix(a10, a11),
-						  b00));
-	matrix s(fast_mat_mul(a11,
-						  add_matrix(b10, b00, -1)));
-	matrix t(fast_mat_mul(add_matrix(a00, a11),
-						  add_matrix(b00, b11)));
-	matrix u(fast_mat_mul(add_matrix(a01, a11, -1),
-						  add_matrix(b10, b11)));
-	matrix v(fast_mat_mul(add_matrix(a00, a10, -1),
-						  add_matrix(b00, b01)));
+	const matrix &p = fast_mat_mul(a00, add_matrix(b01, b11, -1));
 
-	matrix result_matrix_00(add_matrix(add_matrix(add_matrix(t, s), u), q, -1));
-	matrix result_matrix_01(add_matrix(p, q));
-	matrix result_matrix_10(add_matrix(r, s));
-	matrix result_matrix_11(add_matrix(add_matrix(add_matrix(t, p), r, -1), v, -1));
+	const matrix &q = fast_mat_mul(add_matrix(a00, a01),
+						  b11);
+	const matrix &r = fast_mat_mul(add_matrix(a10, a11),
+						  b00);
+	const matrix &s = fast_mat_mul(a11,
+						  add_matrix(b10, b00, -1));
+	const matrix &t = fast_mat_mul(add_matrix(a00, a11),
+						  add_matrix(b00, b11));
+	const matrix &u = fast_mat_mul(add_matrix(a01, a11, -1),
+						  add_matrix(b10, b11));
+	const matrix &v = fast_mat_mul(add_matrix(a00, a10, -1),
+						  add_matrix(b00, b01));
+
+	const matrix &result_matrix_00 = add_matrix(add_matrix(add_matrix(t, s), u), q, -1);
+	const matrix &result_matrix_01 = add_matrix(p, q);
+	const matrix &result_matrix_10 = add_matrix(r, s);
+	const matrix &result_matrix_11 = add_matrix(add_matrix(add_matrix(t, p), r, -1), v, -1);
 
 	// Fill the result matrix with the sub-matrices
 	merge_matrix(result_matrix, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
@@ -163,7 +163,7 @@ matrix fast_mat_mul(matrix matrix_a, matrix matrix_b) {
 }
 
 // this function multiplies 2 matrices using the fast alternative basis matrix algorithm
-matrix faster_mat_mul(matrix matrix_a, matrix matrix_b) {
+matrix faster_mat_mul(const matrix &matrix_a, const matrix &matrix_b) {
 	int col_1 = matrix_a[0].size();
 	int row_1 = matrix_a.size();
 	int col_2 = matrix_b[0].size();
@@ -203,18 +203,18 @@ matrix faster_mat_mul(matrix matrix_a, matrix matrix_b) {
 	split_matrix_and_base_transfer(matrix_b, b00, b01, b10, b11);	
 
 	// using faster_mat_mul instead of fast.
-	matrix m1(faster_mat_mul(a11, b11));
-	matrix m2(faster_mat_mul(a10, b10));
-	matrix m3(faster_mat_mul(a01, b01));
-	matrix m4(faster_mat_mul(a00, b00));
-	matrix m5(faster_mat_mul(add_matrix(a01, a10, -1), add_matrix(b11, b01, -1)));
-	matrix m6(faster_mat_mul(add_matrix(a01, a00, -1), add_matrix(b01, b10, -1)));
-	matrix m7(faster_mat_mul(add_matrix(a11, a01, -1), add_matrix(b01, b00, -1))); 
+	const matrix &m1 = faster_mat_mul(a11, b11);
+	const matrix &m2 = faster_mat_mul(a10, b10);
+	const matrix &m3 = faster_mat_mul(a01, b01);
+	const matrix &m4 = faster_mat_mul(a00, b00);
+	const matrix &m5 = faster_mat_mul(add_matrix(a01, a10, -1), add_matrix(b11, b01, -1));
+	const matrix &m6 = faster_mat_mul(add_matrix(a01, a00, -1), add_matrix(b01, b10, -1));
+	const matrix &m7 = faster_mat_mul(add_matrix(a11, a01, -1), add_matrix(b01, b00, -1)); 
 
-	matrix result_matrix_00(add_matrix(m4, m5));
-	matrix result_matrix_01(add_matrix(add_matrix(add_matrix(m3, m5), m6, -1), m7));
-	matrix result_matrix_10(add_matrix(m2, m7));
-	matrix result_matrix_11(add_matrix(m1, m6, -1));
+	const matrix &result_matrix_00 = add_matrix(m4, m5);
+	const matrix &result_matrix_01 = add_matrix(add_matrix(add_matrix(m3, m5), m6, -1), m7);
+	const matrix &result_matrix_10 = add_matrix(m2, m7);
+	const matrix &result_matrix_11 = add_matrix(m1, m6, -1);
 
 	// return to standard base
 	merge_matrix_and_reverse_base_transfer(result_matrix, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
@@ -234,7 +234,7 @@ matrix random_matrix(int m, int n) {
 }
 
 // this function receives two matrices and returns true iff they are equal
-bool equal_matrix(matrix matrix_a, matrix matrix_b) {
+bool equal_matrix(const matrix &matrix_a, const matrix &matrix_b) {
 	int col_1 = matrix_a[0].size();
 	int row_1 = matrix_a.size();
 	int col_2 = matrix_b[0].size();
