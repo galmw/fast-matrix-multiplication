@@ -28,16 +28,19 @@ void print_matrix(matrix &matrix) {
 	return;
 }
 
-matrix add_matrix(matrix matrix_a, matrix matrix_b, int multiplier = 1) {
+matrix add_matrix(const matrix& matrix_a, const matrix &matrix_b, int multiplier = 1) {
+	row result_matrix_row(matrix_a[0].size(), 0);
+	matrix result_matrix(matrix_a.size(), result_matrix_row);
+
 	int size = matrix_a.size();
 	for (auto i = 0; i < size; i++)
 		for (auto j = 0; j < size; j++)
-			matrix_a[i][j] = matrix_a[i][j] + (multiplier * matrix_b[i][j]);
-	return matrix_a;
+			result_matrix[i][j] = matrix_a[i][j] + (multiplier * matrix_b[i][j]);
+	return result_matrix;
 }
 
 // this function receives a matrix and splits it into 4 sub-matrices: a00, a01, a10, a11
-void split_matrix(matrix &mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11) {
+void split_matrix(const matrix &mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11) {
 	int size = mat[0].size() / 2;
 
 	for (auto i = 0; i < size; i++) {
@@ -51,7 +54,7 @@ void split_matrix(matrix &mat, matrix &a00, matrix &a01, matrix &a10, matrix &a1
 }
 
 // this function recieves a matrix and returns 4 sub-matrices, after a base transfer
-void split_matrix_and_base_transfer(matrix &mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11) {
+void split_matrix_and_base_transfer(const matrix &mat, matrix &a00, matrix &a01, matrix &a10, matrix &a11) {
 	int size = mat.size() / 2;
 
 	for (auto i = 0; i < size; i++) {
@@ -120,6 +123,7 @@ matrix fast_mat_mul(matrix matrix_a, matrix matrix_b) {
 
 	row row_vector(split_index, 0);
 
+	// Allocate sub-matrices
 	matrix a00(split_index, row_vector);
 	matrix a01(split_index, row_vector);
 	matrix a10(split_index, row_vector);
@@ -184,6 +188,7 @@ matrix faster_mat_mul(matrix matrix_a, matrix matrix_b) {
 
 	row row_vector(split_index, 0);
 
+	// Allocate sub-matrices
 	matrix a00(split_index, row_vector);
 	matrix a01(split_index, row_vector);
 	matrix a10(split_index, row_vector);
