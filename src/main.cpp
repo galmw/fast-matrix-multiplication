@@ -6,13 +6,14 @@
 
 using namespace std;
 
-#define COLUMN_WIDTH 	 (11)
+#define COLUMN_WIDTH 	 (13)
 #define NUM_ITERATIONS	 (8)
 
 // this function receives a matrix, an algorithm, and a pointer to a time variable and return the output matrix
-matrix run_algorithm(const matrix &mat_a, const matrix &mat_b, matrix (*algorithm)(const matrix &, const matrix &), double *time_taken) {
+matrix run_algorithm(const matrix &mat_a, const matrix &mat_b, void (*algorithm)(matrix &, const matrix &, const matrix &), double *time_taken) {
+	matrix result = create_matrix(mat_a.size());
 	clock_t start = clock();
-	const matrix &result = algorithm(mat_a, mat_b);
+	algorithm(result, mat_a, mat_b);
 	clock_t end = clock();
 	*time_taken = (double)(end - start) / CLOCKS_PER_SEC;
 	return result;
@@ -36,10 +37,10 @@ int main() {
 
 		const matrix &result_strassen = run_algorithm(matrix_a, matrix_b, fast_mat_mul, &time_taken);
 		strassen_times.push_back(time_taken);
-
+		
 		const matrix &result_faster = run_algorithm(matrix_a, matrix_b, faster_mat_mul, &time_taken);
 		faster_times.push_back(time_taken);
-
+		
 		if (!equal_matrix(result_standard, result_strassen) || !equal_matrix(result_standard, result_faster)) {
 			std::cout << "Something went wrong - The results are not equal" << std::endl;
 		}
