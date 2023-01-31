@@ -10,7 +10,7 @@ using namespace std;
 #define NUM_ITERATIONS	 (8)
 
 // this function receives a matrix, an algorithm, and a pointer to a time variable and return the output matrix
-matrix run_algorithm(const matrix &mat_a, const matrix &mat_b, void (*algorithm)(matrix &, const matrix &, const matrix &), double *time_taken) {
+matrix run_algorithm(matrix &mat_a, matrix &mat_b, void (*algorithm)(matrix &, matrix &, matrix &), double *time_taken) {
 	matrix result = create_matrix(mat_a.size());
 	clock_t start = clock();
 	algorithm(result, mat_a, mat_b);

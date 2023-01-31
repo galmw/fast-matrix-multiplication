@@ -7,7 +7,7 @@ matrix create_matrix(int size) {
 	return mat;
 }
 
-void standard_mat_mul(matrix &result, const matrix &mat_a, const matrix &mat_b) {
+void standard_mat_mul(matrix &result, matrix &mat_a, matrix &mat_b) {
     for (int i = 0; i < mat_a.size(); i++) {
         for (int j = 0; j < mat_b.size(); j++) {
             result[i][j] = 0;
@@ -151,7 +151,7 @@ void merge_matrix(matrix &result, const matrix &a00, const matrix &a01, const ma
 }
 
 // this function multiplies 2 matrices using the Strassen algorithm
-void fast_mat_mul(matrix &result, const matrix &matrix_a, const matrix &matrix_b) {
+void fast_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b) {
 	int col_1 = matrix_a[0].size();
 	int row_2 = matrix_b.size();
 
@@ -243,7 +243,7 @@ void fast_mat_mul(matrix &result, const matrix &matrix_a, const matrix &matrix_b
 
 
 // this function multiplies 2 matrices using the fast alternative basis matrix algorithm
-void faster_mat_mul(matrix &result, const matrix &matrix_a, const matrix &matrix_b) {
+void faster_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b) {
 	int col_1 = matrix_a[0].size();
 	int row_2 = matrix_b.size();
 
@@ -260,8 +260,6 @@ void faster_mat_mul(matrix &result, const matrix &matrix_a, const matrix &matrix
 	}
 
 	int split_index = col_1 / 2;
-
-	row row_vector(split_index, 0);
 
 	// Allocate sub-matrices
 	matrix a00 = create_matrix(split_index);

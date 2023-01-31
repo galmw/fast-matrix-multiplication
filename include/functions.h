@@ -11,11 +11,11 @@ typedef std::vector<row> matrix;
 
 matrix create_matrix(int size);
 
-void standard_mat_mul(matrix &result, const matrix &mat1, const matrix &mat2);
+void standard_mat_mul(matrix &result, matrix &mat1, matrix &mat2);
 
-void fast_mat_mul(matrix &result, const matrix &matrix_a, const matrix &matrix_b);
+void fast_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b);
 
-void faster_mat_mul(matrix &result, const matrix &matrix_a, const matrix &matrix_b);
+void faster_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b);
 
 matrix random_matrix(int m, int n);
 
