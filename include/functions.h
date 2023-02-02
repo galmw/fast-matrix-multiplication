@@ -9,17 +9,21 @@
 typedef std::vector<int> row;
 typedef std::vector<row> matrix;
 
-matrix standard_mat_mul(matrix mat1, matrix mat2);
+matrix create_matrix(int size);
 
-matrix fast_mat_mul(matrix mat1, matrix mat2);
+void standard_mat_mul(matrix &result, matrix &mat1, matrix &mat2);
 
-matrix faster_mat_mul(matrix mat1, matrix mat2);
+void fast_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b);
+
+void faster_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b);
 
 matrix random_matrix(int m, int n);
 
-void print_matrix(matrix &matrix);
+void base_transfer(matrix &matrix);
 
-bool equal_matrix(matrix matrix_a, matrix matrix_b);
+void print_matrix(const matrix &matrix);
+
+bool equal_matrix(const matrix &matrix_a, const matrix &matrix_b);
 
 // end of header guard
 #endif
