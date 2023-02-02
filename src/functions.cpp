@@ -31,14 +31,15 @@ void print_matrix(const matrix &matrix) {
 	return;
 }
 
-void add_matrix(matrix &result, const matrix& matrix_a, const matrix &matrix_b, int multiplier = 1, int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int size = 0) {
+void add_matrix(matrix &result, const matrix& matrix_a, const matrix &matrix_b, int multiplier = 1,
+				int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int c_i = 0, int c_j = 0, int size = 0) {
 	if (size == 0) {
 		size = matrix_a.size();
 	}
 
 	for (auto i = 0; i < size; i++) {
 		for (auto j = 0; j < size; j++) {
-			result[i][j] = matrix_a[a_i + i][a_j + j] + (multiplier * matrix_b[b_i + i][b_j + j]);
+			result[c_i + i][c_j + j] = matrix_a[a_i + i][a_j + j] + (multiplier * matrix_b[b_i + i][b_j + j]);
 		}
 	}
 }
@@ -76,46 +77,24 @@ void split_matrix_and_base_transfer(const matrix &mat, matrix &a00, matrix &a01,
 void base_transfer(matrix &mat) {
 	int size = mat.size() / 2;
 	// step 1
-	for (auto i = 0; i < size; i++) {
-		for (auto j = 0; j < size; j++) {
-			mat[i + size][j] = mat[i + size][j + size] - mat[i + size][j];
-		}
-	}
+	add_matrix(mat, mat, mat, -1, size, size, size, 0, size, 0, size);
 	// step 2
-	for (auto i = 0; i < size; i++) {
-		for (auto j = 0; j < size; j++) {
-			mat[i + size][j + size] += mat[i][j + size];
-		}
-	}
+	add_matrix(mat, mat, mat, 1, size, size, 0, size, size, size, size);
 	// step 3
-	for (auto i = 0; i < size; i++) {
-		for (auto j = 0; j < size; j++) {
-			mat[i][j + size] -= mat[i + size][j];
-		}
-	}
+	add_matrix(mat, mat, mat, 1, 0, size, size, 0, 0, size, size);
 }
 
 // this function reverse transfers a matrix from the alternative base, in-place
 void reverse_base_transfer(matrix &mat) {
 	int size = mat.size() / 2;
 	// step 1
-	for (auto i = 0; i < size; i++) {
-		for (auto j = 0; j < size; j++) {
-			mat[i][j + size] += mat[i + size][j];
-		}
-	}
+	add_matrix(mat, mat, mat, -1, size, size, 0, size, size, size, size);
 	// step 2
-	for (auto i = 0; i < size; i++) {
-		for (auto j = 0; j < size; j++) {
-			mat[i + size][j + size] -= mat[i][j + size];
-		}
-	}
+	add_matrix(mat, mat, mat, -1, 0, size, size, 0, 0, size, size);
 	// step 3
-	for (auto i = 0; i < size; i++) {
-		for (auto j = 0; j < size; j++) {
-			mat[i + size][j] = mat[i + size][j + size] + mat[i + size][j];
-		}
-	}
+	add_matrix(mat, mat, mat, 1, size, size, size, 0, size, size, size);
+	// step 4
+	add_matrix(mat, mat, mat, -1, size, size, size, 0, size, 0, size);
 }
 
 
@@ -183,40 +162,40 @@ void fast_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b) {
 	split_matrix(matrix_b, b00, b01, b10, b11);
 
 	// Allocate sub-matrices
-	matrix p = create_matrix(split_index);
-	matrix q = create_matrix(split_index);
-	matrix r = create_matrix(split_index);
-	matrix s = create_matrix(split_index);
-	matrix t = create_matrix(split_index);
-	matrix u = create_matrix(split_index);
-	matrix v = create_matrix(split_index);
+	matrix m1 = create_matrix(split_index);
+	matrix m2 = create_matrix(split_index);
+	matrix m3 = create_matrix(split_index);
+	matrix m4 = create_matrix(split_index);
+	matrix m5 = create_matrix(split_index);
+	matrix m6 = create_matrix(split_index);
+	matrix m7 = create_matrix(split_index);
 
 	matrix temp0 = create_matrix(split_index);
 
 	add_matrix(temp0, b01, b11, -1);
-	fast_mat_mul(p, a00, temp0);
+	fast_mat_mul(m1, a00, temp0);
 
 	add_matrix(temp0, a00, a01);
-	fast_mat_mul(q, temp0, b11);
+	fast_mat_mul(m2, temp0, b11);
 
 	add_matrix(temp0, a10, a11);
-	fast_mat_mul(r, temp0, b00);
+	fast_mat_mul(m3, temp0, b00);
 	
 	add_matrix(temp0, b10, b00, -1);
-	fast_mat_mul(s, a11, temp0);
+	fast_mat_mul(m4, a11, temp0);
 	
 	matrix temp1 = create_matrix(split_index);
 	add_matrix(temp0, a00, a11);
 	add_matrix(temp1, b00, b11);
-	fast_mat_mul(t, temp0, temp1);
+	fast_mat_mul(m5, temp0, temp1);
 	
 	add_matrix(temp0, a01, a11, -1);
 	add_matrix(temp1, b10, b11);
-	fast_mat_mul(u, temp0, temp1);
+	fast_mat_mul(m6, temp0, temp1);
 
 	add_matrix(temp0, a00, a10, -1);
 	add_matrix(temp1, b00, b01);
-	fast_mat_mul(v, temp0, temp1);
+	fast_mat_mul(m7, temp0, temp1);
 	
 	// Allocate sub-matrices
 	matrix result_matrix_00 = create_matrix(split_index);
@@ -225,16 +204,16 @@ void fast_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b) {
 	matrix result_matrix_11 = create_matrix(split_index);
 
 	// Calculate the sub-matrices
-	add_matrix(result_matrix_00, t, s);
-	add_matrix(result_matrix_00, result_matrix_00, u);
-	add_matrix(result_matrix_00, result_matrix_00, q, -1);
+	add_matrix(result_matrix_00, m5, m4);
+	add_matrix(result_matrix_00, result_matrix_00, m6);
+	add_matrix(result_matrix_00, result_matrix_00, m2, -1);
 
-	add_matrix(result_matrix_01, p, q);
-	add_matrix(result_matrix_10, r, s);
+	add_matrix(result_matrix_01, m1, m2);
+	add_matrix(result_matrix_10, m3, m4);
 
-	add_matrix(result_matrix_11, t, p);
-	add_matrix(result_matrix_11, result_matrix_11, r, -1);
-	add_matrix(result_matrix_11, result_matrix_11, v, -1);
+	add_matrix(result_matrix_11, m5, m1);
+	add_matrix(result_matrix_11, result_matrix_11, m3, -1);
+	add_matrix(result_matrix_11, result_matrix_11, m7, -1);
 
 	// Fill the result matrix with the sub-matrices
 	merge_matrix(result, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
@@ -271,12 +250,13 @@ void faster_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b) {
 	matrix b10 = create_matrix(split_index);
 	matrix b11 = create_matrix(split_index);
 
-	//base_transfer(matrix_a);
-	//base_transfer(matrix_b);
-
 	// Splitting matrices A and B into 4 sub-matrices with a base transfer
-	split_matrix_and_base_transfer(matrix_a, a00, a01, a10, a11);
-	split_matrix_and_base_transfer(matrix_b, b00, b01, b10, b11);	
+	base_transfer(matrix_a);
+	base_transfer(matrix_b);
+	split_matrix(matrix_a, a00, a01, a10, a11);
+	split_matrix(matrix_b, b00, b01, b10, b11);
+	reverse_base_transfer(matrix_a);
+	reverse_base_transfer(matrix_b);
 
 	// Allocate sub-matrices
 	matrix m1 = create_matrix(split_index);
@@ -313,6 +293,22 @@ void faster_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b) {
 	matrix result_matrix_10 = create_matrix(split_index);
 	matrix result_matrix_11 = create_matrix(split_index);
 
+	/*	
+	// 00
+	add_matrix(result, m4, m5, 1, 0, 0, 0, 0, 0, 0, split_index);
+
+	// 01
+	add_matrix(result, m3, m5, 1, 0, 0, 0, 0, 0, split_index, split_index);
+	add_matrix(result, result, m6, -1, 0, 0, 0, 0, 0, split_index, split_index);	
+	add_matrix(result, result, m7, 1, 0, 0, 0, 0, 0, split_index, split_index);
+
+	// 10
+	add_matrix(result, m2, m7, 1, 0, 0, 0, 0, split_index, 0, split_index);
+
+	// 11
+	add_matrix(result, m1, m6, -1, 0, 0, 0, 0, split_index, split_index, split_index);
+	*/
+	
 	add_matrix(result_matrix_00, m4, m5);
 
 	add_matrix(result_matrix_01, m3, m5);
@@ -322,12 +318,13 @@ void faster_mat_mul(matrix &result, matrix &matrix_a, matrix &matrix_b) {
 	add_matrix(result_matrix_10, m2, m7);
 
 	add_matrix(result_matrix_11, m1, m6, -1);
-
 	// return to standard base
-	merge_matrix_and_reverse_base_transfer(result, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
+	
+	merge_matrix(result, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
+	
+	reverse_base_transfer(result);
 	return;
 }
-
 
 // this function returns a random matrix with the given size
 matrix random_matrix(int m, int n) {
