@@ -23,11 +23,18 @@ include_directories (${PROJECT_SOURCE_DIR}/${INCL_DIR})
 # Important: Include all source files on this list
 set (SOURCE
     ${SRC_DIR}/main.cpp
-    ${SRC_DIR}/functions.cpp
+    ${SRC_DIR}/mult_functions.cpp
+    ${SRC_DIR}/matrix.cpp
 )
 
 # Output folder
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
+# Add framework
+find_library(ACCELERATE_FRAMEWORK Accelerate)
+
 # Add the executable for the program
 add_executable (${PROJECT_NAME} ${SOURCE})
+
+# Linj the framework
+target_link_libraries(${PROJECT_NAME} ${ACCELERATE_FRAMEWORK})
