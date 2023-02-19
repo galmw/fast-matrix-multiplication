@@ -10,7 +10,7 @@
 class Matrix {
     public:
         Matrix(int, int);
-        //Matrix(const Matrix&);
+        Matrix(const Matrix&);
         ~Matrix();
         //Matrix(const Matrix&);
         //Matrix& operator=(const Matrix&);
@@ -44,6 +44,8 @@ class Matrix {
         friend void matmul_ks(Matrix&, Matrix&, Matrix&);
 
     private:
+        friend void matmul_ks_inner(Matrix&, Matrix&, Matrix&);
+
         int rows_, cols_;
         double **p;
         double *arr;

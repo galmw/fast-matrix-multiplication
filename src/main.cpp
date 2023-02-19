@@ -29,7 +29,7 @@ int main() {
 	std::cout << "Starting!" << std::endl;
 	
 	double time_taken;
-	vector<double> standard_times, dgemm_times, strassen_times, faster_times;
+	vector<double> standard_times, dgemm_times, strassen_times, ks_times;
 	
 	for (auto i = 0; i < NUM_ITERATIONS; ++i) {
 		std::cout << "Testing with matrix size: " << (2 << i) << std::endl;
@@ -47,10 +47,12 @@ int main() {
 		Matrix result_strassen = run_algorithm(matrix_a, matrix_b, matmul_strassen, &time_taken);
 		strassen_times.push_back(time_taken);
 		
-		Matrix result_faster = run_algorithm(matrix_a, matrix_b, matmul_ks, &time_taken);
-		faster_times.push_back(time_taken);
+		Matrix result_ks = run_algorithm(matrix_a, matrix_b, matmul_ks, &time_taken);
+		ks_times.push_back(time_taken);
 		
-		if (!Matrix::equal(result_standard, result_dgemm) || !Matrix::equal(result_standard, result_strassen)) {
+		if (!Matrix::equal(result_standard, result_dgemm) || 
+			!Matrix::equal(result_standard, result_strassen) ||
+			!Matrix::equal(result_standard, result_ks)) {
 			std::cout << "Something went wrong - The results are not equal" << std::endl;
 		}
 
@@ -63,22 +65,25 @@ int main() {
 
 			std::cout << "Strassen matrix:" << std::endl;
 			std::cout << result_strassen << std::endl;
+
+			std::cout << "KS matrix:" << std::endl;
+			std::cout << result_ks << std::endl;
 		}
 	}
 
 	// print the results as a table
 	std::cout << setw(COLUMN_WIDTH) << "Matrix size"
-			  << setw(COLUMN_WIDTH) << "  DGEMM time"
-			  << setw(COLUMN_WIDTH) << "  Standard time"	  
+			  << setw(COLUMN_WIDTH) << "  DGEMM times"
+			  << setw(COLUMN_WIDTH) << "  Standard times"	  
 			  << setw(COLUMN_WIDTH) << "  Strassen times"
-			  << setw(COLUMN_WIDTH) << "  Faster time" << std::endl;
+			  << setw(COLUMN_WIDTH) << "  KS times" << std::endl;
 	
 	for (auto i = 0; i < NUM_ITERATIONS; ++i) {
 		std::cout << setw(COLUMN_WIDTH) << (2 << i)
 				  << setw(COLUMN_WIDTH) << dgemm_times[i] << setprecision(5)
 				  << setw(COLUMN_WIDTH) << standard_times[i] << setprecision(5)		  
 				  << setw(COLUMN_WIDTH) << strassen_times[i] << setprecision(5) 
-				  << setw(COLUMN_WIDTH) << faster_times[i] << setprecision(5) << std::endl;
+				  << setw(COLUMN_WIDTH) << ks_times[i] << setprecision(5) << std::endl;
 	}
 	
 	return 0;

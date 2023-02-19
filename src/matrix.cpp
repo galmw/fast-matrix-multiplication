@@ -19,6 +19,18 @@ Matrix::Matrix(int rows, int cols) : rows_(rows), cols_(cols)
     allocSpace();
 }
 
+// Matrix copy constructor
+Matrix::Matrix(const Matrix& mat) {
+    rows_ = mat.rows_;
+    cols_ = mat.cols_;
+    allocSpace();
+    for (int i = 0; i < rows_; ++i) {
+        for (int j = 0; j < cols_; ++j) {
+            p[i][j] = mat.p[i][j];
+        }
+    }
+}
+
 Matrix::~Matrix()
 {
     delete arr;
