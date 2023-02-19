@@ -89,7 +89,6 @@ void Matrix::add_matrix(Matrix &result, Matrix& matrix_a, Matrix &matrix_b, int 
 	}
 }
 
-
 // this function recieves 4 sub-matrices and returns a Matrix
 void Matrix::merge_matrix(Matrix &result, Matrix &a00, Matrix &a01, Matrix &a10, Matrix &a11) {
     int size = a00.rows();

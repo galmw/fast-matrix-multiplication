@@ -3,7 +3,9 @@
 #include <iomanip>
 #include <vector>
 #include "matrix.h"
-#include "mult_functions.h"
+#include "matmul_standard.h"
+#include "matmul_strassen.h"
+#include "matmul_ks.h"
 
 using namespace std;
 
@@ -14,7 +16,7 @@ using namespace std;
 
 // this function receives a matrix, an algorithm, and a pointer to a time variable and return the output matrix
 Matrix run_algorithm(Matrix &mat_a, Matrix &mat_b, void (*algorithm)(Matrix &, Matrix &, Matrix &), double *time_taken) {
-	Matrix result = Matrix(mat_a.rows(), mat_b.cols());
+	Matrix result(mat_a.rows(), mat_b.cols());
 	clock_t start = clock();
 	algorithm(result, mat_a, mat_b);
 	clock_t end = clock();
@@ -36,20 +38,18 @@ int main() {
 		Matrix matrix_b = Matrix::create_random(2 << i, 2 << i);
 		// measure the time of the standard matrix multiplication
 		
-		Matrix result_dgemm = run_algorithm(matrix_a, matrix_b, dgemm, &time_taken);
+		Matrix result_dgemm = run_algorithm(matrix_a, matrix_b, matmul_dgemm, &time_taken);
 		dgemm_times.push_back(time_taken);
 
-		Matrix result_standard = run_algorithm(matrix_a, matrix_b, standard_mat_mul, &time_taken);
+		Matrix result_standard = run_algorithm(matrix_a, matrix_b, matmul_standard, &time_taken);
 		standard_times.push_back(time_taken);
 
-		Matrix result_strassen = run_algorithm(matrix_a, matrix_b, strassen, &time_taken);
+		Matrix result_strassen = run_algorithm(matrix_a, matrix_b, matmul_strassen, &time_taken);
 		strassen_times.push_back(time_taken);
-		/*
-		const matrix &result_faster = run_algorithm(matrix_a, matrix_b, faster_mat_mul, &time_taken);
+		
+		Matrix result_faster = run_algorithm(matrix_a, matrix_b, matmul_ks, &time_taken);
 		faster_times.push_back(time_taken);
-		*/
-		faster_times.push_back(0);
-
+		
 		if (!Matrix::equal(result_standard, result_dgemm) || !Matrix::equal(result_standard, result_strassen)) {
 			std::cout << "Something went wrong - The results are not equal" << std::endl;
 		}

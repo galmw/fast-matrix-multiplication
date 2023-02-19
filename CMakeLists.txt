@@ -23,7 +23,9 @@ include_directories (${PROJECT_SOURCE_DIR}/${INCL_DIR})
 # Important: Include all source files on this list
 set (SOURCE
     ${SRC_DIR}/main.cpp
-    ${SRC_DIR}/mult_functions.cpp
+    ${SRC_DIR}/matmul_standard.cpp
+    ${SRC_DIR}/matmul_strassen.cpp
+    ${SRC_DIR}/matmul_ks.cpp
     ${SRC_DIR}/matrix.cpp
 )
 

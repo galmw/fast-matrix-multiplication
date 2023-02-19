@@ -10,6 +10,7 @@
 class Matrix {
     public:
         Matrix(int, int);
+        //Matrix(const Matrix&);
         ~Matrix();
         //Matrix(const Matrix&);
         //Matrix& operator=(const Matrix&);
@@ -37,10 +38,10 @@ class Matrix {
         int rows();
         int cols();
 
-
-        friend void dgemm(Matrix&, Matrix&, Matrix&);
-        friend void standard_mat_mul(Matrix&, Matrix&, Matrix&);
-        friend void strassen(Matrix&, Matrix&, Matrix&);
+        friend void matmul_dgemm(Matrix&, Matrix&, Matrix&);
+        friend void matmul_standard(Matrix&, Matrix&, Matrix&);
+        friend void matmul_strassen(Matrix&, Matrix&, Matrix&);
+        friend void matmul_ks(Matrix&, Matrix&, Matrix&);
 
     private:
         int rows_, cols_;
