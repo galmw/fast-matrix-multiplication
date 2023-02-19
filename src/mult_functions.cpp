@@ -40,29 +40,29 @@ void strassen(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	int split_index = size / 2;
 
 	// Allocate sub-matrices
-	Matrix a00 = Matrix(split_index, split_index);
-	Matrix a01 = Matrix(split_index, split_index);
-	Matrix a10 = Matrix(split_index, split_index);
-	Matrix a11 = Matrix(split_index, split_index);
-	Matrix b00 = Matrix(split_index, split_index);
-	Matrix b01 = Matrix(split_index, split_index);
-	Matrix b10 = Matrix(split_index, split_index);
-	Matrix b11 = Matrix(split_index, split_index);
+	Matrix a00(split_index, split_index);
+	Matrix a01(split_index, split_index);
+	Matrix a10(split_index, split_index);
+	Matrix a11(split_index, split_index);
+	Matrix b00(split_index, split_index);
+	Matrix b01(split_index, split_index);
+	Matrix b10(split_index, split_index);
+	Matrix b11(split_index, split_index);
 
 	// Splitting matrices A and B into 4 sub-matrices
 	Matrix::split_matrix(mat_a, a00, a01, a10, a11, size);
 	Matrix::split_matrix(mat_b, b00, b01, b10, b11, size);
 
 	// Allocate sub-matrices
-	Matrix m1 = Matrix(split_index, split_index);
-	Matrix m2 = Matrix(split_index, split_index);
-	Matrix m3 = Matrix(split_index, split_index);
-	Matrix m4 = Matrix(split_index, split_index);
-	Matrix m5 = Matrix(split_index, split_index);
-	Matrix m6 = Matrix(split_index, split_index);
-	Matrix m7 = Matrix(split_index, split_index);
+	Matrix m1(split_index, split_index);
+	Matrix m2(split_index, split_index);
+	Matrix m3(split_index, split_index);
+	Matrix m4(split_index, split_index);
+	Matrix m5(split_index, split_index);
+	Matrix m6(split_index, split_index);
+	Matrix m7(split_index, split_index);
 
-	Matrix temp0 = Matrix(split_index, split_index);
+	Matrix temp0(split_index, split_index);
 
 	Matrix::add_matrix(temp0, b01, b11, -1);
 	strassen(m1, a00, temp0);
@@ -76,7 +76,7 @@ void strassen(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	Matrix::add_matrix(temp0, b10, b00, -1);
 	strassen(m4, a11, temp0);
 	
-	Matrix temp1 = Matrix(split_index, split_index);
+	Matrix temp1(split_index, split_index);
 	Matrix::add_matrix(temp0, a00, a11);
 	Matrix::add_matrix(temp1, b00, b11);
 	strassen(m5, temp0, temp1);
@@ -90,10 +90,10 @@ void strassen(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	strassen(m7, temp0, temp1);
 	
 	// Allocate sub-matrices
-	Matrix result_matrix_00 = Matrix(split_index, split_index);
-	Matrix result_matrix_01 = Matrix(split_index, split_index);
-	Matrix result_matrix_10 = Matrix(split_index, split_index);
-	Matrix result_matrix_11 = Matrix(split_index, split_index);
+	Matrix result_matrix_00(split_index, split_index);
+	Matrix result_matrix_01(split_index, split_index);
+	Matrix result_matrix_10(split_index, split_index);
+	Matrix result_matrix_11(split_index, split_index);
 
 	// Calculate the sub-matrices
 	Matrix::add_matrix(result_matrix_00, m5, m4);

@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 
 example_input = """
-            2        2e-06      1.2e-05      1.2e-05
-            4        1e-06      9.1e-05      9.3e-05
-            8        6e-06     0.000685     0.000656
-           16      2.9e-05     0.004698     0.004709
-           32     0.000219     0.032731     0.032889
-           64     0.001754      0.23261      0.22935
-          128      0.01347       1.5227       1.5448
-          256      0.10854        10.48       10.809
+            2      3.8e-05        1e-06        3e-06    
+            4        2e-06        1e-06        2e-05      
+            8            0        3e-06     0.000121      
+           16        8e-06      1.8e-05     0.000855     
+           32        3e-06     0.000145     0.006133     
+           64        8e-06     0.001004     0.041283      
+          128      2.9e-05     0.007761      0.28759      
+          256      0.00016     0.062289       1.9759   
 """
 
 # this function receives a list of points and plots them
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     points = []
     for line in example_input.splitlines():
         if line.strip():
-            n, standard, strassen, faster = line.split()
-            points.append((n, float(standard), float(strassen), float(faster)))
+            n, dgemm, standard, strassen = line.split()
+            points.append((n, float(dgemm), float(standard), float(strassen)))
 
     plot_points(points)
