@@ -4,6 +4,7 @@
 
 // this function transfers a Matrix to the alternative base, in-place
 // It performs one step of the base transfer, for the submatrix staring in (i,j), of square size 'size'.
+// The minimum expected 'size' is 1.
 void base_transfer_step(Matrix &mat, int size, int i=0, int j=0) {
 	// step 1
 	Matrix::add_matrix(mat, mat, mat, -1, i + size, j + size, i + size, j + 0, i + size, j + 0, size);
@@ -13,7 +14,7 @@ void base_transfer_step(Matrix &mat, int size, int i=0, int j=0) {
 	Matrix::add_matrix(mat, mat, mat, 1, i + 0, j + size, i + size, j + 0, i + 0, j + size, size);
 }
 
-// this function reverse transfers a Matrix from the alternative base, in-place
+// this function reverse transfers a Matrix from the alternative base, in-place.
 void reverse_base_transfer_step(Matrix &mat, int size, int i=0, int j=0) {
 	// step 1
 	Matrix::add_matrix(mat, mat, mat, -1, i + size, j + size, i + 0, j + size, i + size, j + size, size);
@@ -31,14 +32,16 @@ void base_transfer_recursive(Matrix &mat, int size, int row=0, int col=0) {
 	if (size == 1) {
 		return;
 	}
-
 	// Perform 1 step of the base transfer
 	base_transfer_step(mat, size / 2, row, col);
-	// Recursively call the function on the 4 submatrices
-	base_transfer_recursive(mat, size / 2, 0, 0);
-	base_transfer_recursive(mat, size / 2, 0, size / 2);
-	base_transfer_recursive(mat, size / 2, size / 2, 0);
-	base_transfer_recursive(mat, size / 2, size / 2, size / 2);
+
+	if (size > 2) {
+		// Recursively call the function on the 4 submatrices
+		base_transfer_recursive(mat, size / 2, 0, 0);
+		base_transfer_recursive(mat, size / 2, 0, size / 2);
+		base_transfer_recursive(mat, size / 2, size / 2, 0);
+		base_transfer_recursive(mat, size / 2, size / 2, size / 2);
+	}
 }
 
 // this function receives a Matrix and recursivly reverse transfers its base, in-place
@@ -46,14 +49,19 @@ void reverse_base_transfer_recursive(Matrix &mat, int size, int row=0, int col=0
 	if (size == 1) {
 		return;
 	}
- 
+
+
 	// Perform 1 step of the reverse base transfer
 	reverse_base_transfer_step(mat, size / 2, row, col);
-	// Recursively call the function on the 4 submatrices
-	reverse_base_transfer_recursive(mat, size / 2, 0, 0);
-	reverse_base_transfer_recursive(mat, size / 2, 0, size / 2);
-	reverse_base_transfer_recursive(mat, size / 2, size / 2, 0);
-	reverse_base_transfer_recursive(mat, size / 2, size / 2, size / 2);
+
+	if (size > 2) {
+		// Recursively call the function on the 4 submatrices
+		reverse_base_transfer_recursive(mat, size / 2, 0, 0);
+		reverse_base_transfer_recursive(mat, size / 2, 0, size / 2);
+		reverse_base_transfer_recursive(mat, size / 2, size / 2, 0);
+		reverse_base_transfer_recursive(mat, size / 2, size / 2, size / 2);
+	}
+
 }
 
 /*
@@ -269,7 +277,7 @@ void matmul_ks_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 
 // this function multiplies 2 matrices using the fast alternative basis Matrix algorithm
 void matmul_ks(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
-	/*
+	
 	Matrix new_a(mat_a);
 	Matrix new_b(mat_b);
 	
@@ -284,20 +292,36 @@ void matmul_ks(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 		std::cout << "BAD" << std::endl;
 	}
 
+	//base_transfer_recursive(new_a, new_a.rows());
+	//base_transfer_recursive(new_b, new_b.rows());
 
 	// try some shit
-	base_transfer_step(new_a, new_a.rows() / 2);
-	reverse_base_transfer_step(new_a, new_a.rows() / 2);
-	
-	base_transfer_recursive(new_a, new_a.rows());
-	reverse_base_transfer_recursive(new_a, new_a.rows());
-	
+	// if (new_a.rows() >= 32) {
+		
+	// 	// base_transfer_step(new_a, new_a.rows() / 2);
+	// 	// reverse_base_transfer_step(new_a, new_a.rows() / 2);
+		
+		
+	// 	base_transfer_recursive(new_a, new_a.rows());
+	// 	reverse_base_transfer_recursive(new_a, new_a.rows());
+		
+	// }
+	/*
+
+	*/
 
 	// assert new_a equals a
 	if (!Matrix::equal(new_a, mat_a)) {
 		std::cout << "BAD2" << std::endl;
+		/*
+		std::cout << "new_a: " << std::endl;
+		std::cout << new_a << std::endl;
+
+		std::cout << "mat_a: " << std::endl;
+		std::cout << mat_a << std::endl;
+		*/
 	}
-	*/
+	
 	//Matrix new_b(mat_b.rows(), mat_b.cols());
 	matmul_ks_inner(result, mat_a, mat_b);
 }

@@ -37,6 +37,14 @@ Matrix::~Matrix()
     delete[] p;
 }
 
+void Matrix::print() {
+    for (int i = 0; i < rows_; ++i) {
+        for (int j = 0; j < cols_; ++j) {
+            std::cout << p[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
 /* STATIC CLASS FUNCTIONS
  ********************************/
 
@@ -46,7 +54,8 @@ Matrix Matrix::create_random(int m, int n) {
 
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
-			result.p[i][j] = arc4random() % 10;
+            // generate a random integer between -5 and 5. TODO - make this any random double between -1 and 1.
+            result.p[i][j] = rand() % 11 - 5;
 		}
 	}
 	return result;

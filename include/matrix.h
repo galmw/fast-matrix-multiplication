@@ -12,6 +12,7 @@ class Matrix {
         Matrix(int, int);
         Matrix(const Matrix&);
         ~Matrix();
+        void print();
         //Matrix(const Matrix&);
         //Matrix& operator=(const Matrix&);
 

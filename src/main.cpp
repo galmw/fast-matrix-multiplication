@@ -11,7 +11,7 @@ using namespace std;
 
 #define COLUMN_WIDTH 	 (13)
 #define NUM_ITERATIONS	 (8)
-#define PRINT_MATRICES	 (false)
+#define PRINT_MATRICES	 (true)
 
 
 // this function receives a matrix, an algorithm, and a pointer to a time variable and return the output matrix
@@ -54,20 +54,19 @@ int main() {
 			!Matrix::equal(result_standard, result_strassen) ||
 			!Matrix::equal(result_standard, result_ks)) {
 			std::cout << "Something went wrong - The results are not equal" << std::endl;
-		}
+			if (PRINT_MATRICES) {
+				std::cout << "Standard matrix:" << std::endl;
+				std::cout << result_standard << std::endl;
 
-		if (PRINT_MATRICES) {
-			std::cout << "Standard matrix:" << std::endl;
-			std::cout << result_standard << std::endl;
+				std::cout << "DGEMM matrix:" << std::endl;
+				std::cout << result_dgemm << std::endl;
 
-			std::cout << "DGEMM matrix:" << std::endl;
-			std::cout << result_dgemm << std::endl;
+				std::cout << "Strassen matrix:" << std::endl;
+				std::cout << result_strassen << std::endl;
 
-			std::cout << "Strassen matrix:" << std::endl;
-			std::cout << result_strassen << std::endl;
-
-			std::cout << "KS matrix:" << std::endl;
-			std::cout << result_ks << std::endl;
+				std::cout << "KS matrix:" << std::endl;
+				std::cout << result_ks << std::endl;
+			}
 		}
 	}
 
