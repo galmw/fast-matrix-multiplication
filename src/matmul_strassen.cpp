@@ -71,16 +71,18 @@
 	Matrix result_matrix_11(split_index, split_index);
 
 	// Calculate the sub-matrices
-	Matrix::add_matrix(result_matrix_00, m5, m4);
-	Matrix::add_matrix(result_matrix_00, result_matrix_00, m6);
-	Matrix::add_matrix(result_matrix_00, result_matrix_00, m2, -1);
 
-	Matrix::add_matrix(result_matrix_01, m1, m2);
-	Matrix::add_matrix(result_matrix_10, m3, m4);
+    // 00
+    Matrix::add_matrix(result_matrix_00, m5, m4, 1, 0, 0, 0, 0, 0, 0, split_index);
+    Matrix::add_matrix(result_matrix_00, result_matrix_00, m6, 1, 0, 0, 0, 0, 0, 0, split_index);
+	Matrix::add_matrix(result_matrix_00, result_matrix_00, m2, -1, 0, 0, 0, 0, 0, 0, split_index);
 
-	Matrix::add_matrix(result_matrix_11, m5, m1);
-	Matrix::add_matrix(result_matrix_11, result_matrix_11, m3, -1);
-	Matrix::add_matrix(result_matrix_11, result_matrix_11, m7, -1);
+	Matrix::add_matrix(result_matrix_01, m1, m2, 1, 0, 0, 0, 0, 0, 0, split_index);
+	Matrix::add_matrix(result_matrix_10, m3, m4, 1, 0, 0, 0, 0, 0, 0, split_index);
+
+	Matrix::add_matrix(result_matrix_11, m5, m1, 1, 0, 0, 0, 0, 0, 0, split_index);
+	Matrix::add_matrix(result_matrix_11, result_matrix_11, m3, -1, 0, 0, 0, 0, 0, 0, split_index);
+	Matrix::add_matrix(result_matrix_11, result_matrix_11, m7, -1, 0, 0, 0, 0, 0, 0, split_index);
 
 	// Fill the result Matrix with the sub-matrices
 	Matrix::merge_matrix(result, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
