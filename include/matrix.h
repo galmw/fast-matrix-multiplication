@@ -30,7 +30,8 @@ class Matrix {
         friend std::istream& operator>>(std::istream&, Matrix&);
 
         static Matrix create_random(int, int);
-        static bool equal(Matrix&, Matrix&);
+        static bool equal(Matrix&, Matrix&, double eps=0.00000001);
+        static double diff(Matrix&, Matrix&);
         static void split_matrix(Matrix&, Matrix&, Matrix&, Matrix&, Matrix&, int);
         static void merge_matrix(Matrix &result, Matrix &a00, Matrix &a01, Matrix &a10, Matrix &a11);
         static void add_matrix(Matrix &result, Matrix& matrix_a, Matrix &matrix_b, int multiplier = 1,

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define COLUMN_WIDTH 	 (13)
+#define COLUMN_WIDTH 	 (16)
 #define NUM_ITERATIONS	 (8)
 #define PRINT_MATRICES	 (true)
 
@@ -30,6 +30,7 @@ int main() {
 	
 	double time_taken;
 	vector<double> standard_times, dgemm_times, strassen_times, ks_times;
+	vector<double> strassen_numerical_err, ks_numerical_err;
 	
 	for (auto i = 0; i < NUM_ITERATIONS; ++i) {
 		std::cout << "Testing with matrix size: " << (2 << i) << std::endl;
@@ -46,9 +47,11 @@ int main() {
 
 		Matrix result_strassen = run_algorithm(matrix_a, matrix_b, matmul_strassen, &time_taken);
 		strassen_times.push_back(time_taken);
+		strassen_numerical_err.push_back(Matrix::diff(result_standard, result_strassen));
 		
 		Matrix result_ks = run_algorithm(matrix_a, matrix_b, matmul_ks, &time_taken);
 		ks_times.push_back(time_taken);
+		ks_numerical_err.push_back(Matrix::diff(result_standard, result_ks));
 		
 		if (!Matrix::equal(result_standard, result_dgemm) || 
 			!Matrix::equal(result_standard, result_strassen) ||
@@ -75,15 +78,21 @@ int main() {
 			  << setw(COLUMN_WIDTH) << "  DGEMM times"
 			  << setw(COLUMN_WIDTH) << "  Standard times"	  
 			  << setw(COLUMN_WIDTH) << "  Strassen times"
-			  << setw(COLUMN_WIDTH) << "  KS times" << std::endl;
+			  << setw(COLUMN_WIDTH) << "  KS times"
+			  << setw(COLUMN_WIDTH) << "  Strassen N.Err"
+			  << setw(COLUMN_WIDTH) << "  KS N.Err" << std::endl;
+
 	
 	for (auto i = 0; i < NUM_ITERATIONS; ++i) {
 		std::cout << setw(COLUMN_WIDTH) << (2 << i)
 				  << setw(COLUMN_WIDTH) << dgemm_times[i] << setprecision(5)
 				  << setw(COLUMN_WIDTH) << standard_times[i] << setprecision(5)		  
 				  << setw(COLUMN_WIDTH) << strassen_times[i] << setprecision(5) 
-				  << setw(COLUMN_WIDTH) << ks_times[i] << setprecision(5) << std::endl;
+				  << setw(COLUMN_WIDTH) << ks_times[i] << setprecision(5)
+				  << setw(COLUMN_WIDTH) << strassen_numerical_err[i] << setprecision(5)
+				  << setw(COLUMN_WIDTH) << ks_numerical_err[i] << setprecision(5) << std::endl;
 	}
-	
+
+
 	return 0;
 }

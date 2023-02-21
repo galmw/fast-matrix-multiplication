@@ -54,8 +54,11 @@ Matrix Matrix::create_random(int m, int n) {
 
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
+            // generate a random double uniformly distributed between -1 and 1
+            result.p[i][j] = (double)rand() / (double)RAND_MAX * 2 - 1;
+
             // generate a random integer between -5 and 5. TODO - make this any random double between -1 and 1.
-            result.p[i][j] = rand() % 11 - 5;
+            //result.p[i][j] = rand() % 11 - 5;
 		}
 	}
 	return result;
@@ -148,7 +151,7 @@ istream& operator>>(istream& is, Matrix& m)
 }
 
 // this function receives two matrices and returns true iff they are equal
-bool Matrix::equal(Matrix &matrix_a, Matrix &matrix_b) {
+bool Matrix::equal(Matrix &matrix_a, Matrix &matrix_b, double eps) {
 	int col_1 = matrix_a.cols();
 	int row_1 = matrix_a.rows();
 	int col_2 = matrix_b.cols();
@@ -160,10 +163,34 @@ bool Matrix::equal(Matrix &matrix_a, Matrix &matrix_b) {
 
 	for (int i = 0; i < row_1; i++) {
 		for (int j = 0; j < col_1; j++) {
-			if (matrix_a.p[i][j] != matrix_b.p[i][j]) {
-				return false;
-			}
+            // check if the absoulte value of the difference between the two numbers is less than eps
+            if (abs(matrix_a.p[i][j] - matrix_b.p[i][j]) > eps) {
+                return false;
+            }
 		}
 	}
 	return true;
+}
+
+// this function recevies two matrices and returns the numberical difference between them
+double Matrix::diff(Matrix &matrix_a, Matrix &matrix_b) {
+    int col_1 = matrix_a.cols();
+    int row_1 = matrix_a.rows();
+    int col_2 = matrix_b.cols();
+    int row_2 = matrix_b.rows();
+
+    if (col_1 != col_2 || row_1 != row_2) {
+        return -1;
+    }
+
+    double max_diff = 0;
+    for (int i = 0; i < row_1; i++) {
+        for (int j = 0; j < col_1; j++) {
+            double diff = abs(matrix_a.p[i][j] - matrix_b.p[i][j]);
+            if (diff > max_diff) {
+                max_diff = diff;
+            }
+        }
+    }
+    return max_diff;
 }
