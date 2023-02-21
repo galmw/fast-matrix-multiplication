@@ -26,6 +26,7 @@ set (SOURCE
     ${SRC_DIR}/matmul_standard.cpp
     ${SRC_DIR}/matmul_strassen.cpp
     ${SRC_DIR}/matmul_ks.cpp
+    ${SRC_DIR}/matmul_sparse.cpp
     ${SRC_DIR}/matrix.cpp
 )
 

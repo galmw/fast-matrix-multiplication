@@ -8,7 +8,7 @@
 		size = mat_a.rows();
 	}
 	if (size == 1) {
-		result.p[0][0] = mat_a.p[0][0] * mat_b.p[0][0];
+		result.p[c_i][c_j] = mat_a.p[a_i][a_j] * mat_b.p[b_i][b_j];
 		return;
 	}
 
@@ -39,29 +39,30 @@
 
 	Matrix temp0(split_index, split_index);
 
-	Matrix::add_matrix(m1, b01, b11, -1);
-	matmul_strassen(m1, a00, m1);
+    Matrix::add_matrix(m1, mat_b, mat_b, -1, 0, split_index, split_index, split_index, 0, 0, split_index);
+	//Matrix::add_matrix(m1, b01, b11, -1);
+	matmul_strassen_inner(m1, a00, m1);
 
 	Matrix::add_matrix(m2, a00, a01);
-	matmul_strassen(m2, m2, b11);
+	matmul_strassen_inner(m2, m2, b11);
 
 	Matrix::add_matrix(m3, a10, a11);
-	matmul_strassen(m3, m3, b00);
+	matmul_strassen_inner(m3, m3, b00);
 	
 	Matrix::add_matrix(m4, b10, b00, -1);
-	matmul_strassen(m4, a11, m4);
+	matmul_strassen_inner(m4, a11, m4);
 	
 	Matrix::add_matrix(temp0, a00, a11);
 	Matrix::add_matrix(m5, b00, b11);
-	matmul_strassen(m5, temp0, m5);
+	matmul_strassen_inner(m5, temp0, m5);
 	
 	Matrix::add_matrix(temp0, a01, a11, -1);
 	Matrix::add_matrix(m6, b10, b11);
-	matmul_strassen(m6, temp0, m6);
+	matmul_strassen_inner(m6, temp0, m6);
 
 	Matrix::add_matrix(temp0, a00, a10, -1);
 	Matrix::add_matrix(m7, b00, b01);
-	matmul_strassen(m7, temp0, m7);
+	matmul_strassen_inner(m7, temp0, m7);
 	
 	// Calculate the sub-matrices, and fill the result Matrix with the sub-matrices
 
@@ -86,5 +87,5 @@
 
 // this function multiplies 2 matrices using the Strassen algorithm
 void matmul_strassen(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
-    matmul_strassen_inner(result, mat_a, mat_b, mat_a.rows(), 0, 0);
+    matmul_strassen_inner(result, mat_a, mat_b);
 }

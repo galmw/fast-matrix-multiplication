@@ -35,10 +35,10 @@ void base_transfer_recursive(Matrix &mat, int size, int row=0, int col=0) {
 
 	if (size > 2) {
 		// Recursively call the function on the 4 submatrices
-		base_transfer_recursive(mat, size / 2, 0, 0);
 		base_transfer_recursive(mat, size / 2, 0, size / 2);
 		base_transfer_recursive(mat, size / 2, size / 2, 0);
 		base_transfer_recursive(mat, size / 2, size / 2, size / 2);
+		base_transfer_recursive(mat, size / 2, 0, 0);
 	}
 
 	// Perform 1 step of the base transfer
@@ -53,10 +53,10 @@ void reverse_base_transfer_recursive(Matrix &mat, int size, int row=0, int col=0
 	}
 	if (size > 2) {
 		// Recursively call the function on the 4 submatrices
-		reverse_base_transfer_recursive(mat, size / 2, 0, 0);
 		reverse_base_transfer_recursive(mat, size / 2, 0, size / 2);
 		reverse_base_transfer_recursive(mat, size / 2, size / 2, 0);
 		reverse_base_transfer_recursive(mat, size / 2, size / 2, size / 2);
+		reverse_base_transfer_recursive(mat, size / 2, 0, 0);
 	}
 
 	// Perform 1 step of the reverse base transfer
@@ -162,7 +162,7 @@ void matmul_ks(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	}
 
 	// try some shit
-	if (mat_a.rows() == -1) {
+	if (mat_a.rows() >= 2) {
 		Matrix new_a(mat_a);
 		Matrix new_b(mat_b);
 	
@@ -173,12 +173,12 @@ void matmul_ks(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 
 		//base_transfer_recursive(new_a, new_a.rows());
 		//base_transfer_recursive(new_b, new_b.rows());
-		// base_transfer_step(new_a, new_a.rows() / 2);
-		// reverse_base_transfer_step(new_a, new_a.rows() / 2);
+		base_transfer_step(new_a, new_a.rows() / 2);
+		reverse_base_transfer_step(new_a, new_a.rows() / 2);
 		
 		
-		base_transfer_recursive(new_a, new_a.rows());
-		reverse_base_transfer_recursive(new_a, new_a.rows());
+		// base_transfer_recursive(new_a, new_a.rows());
+		// reverse_base_transfer_recursive(new_a, new_a.rows());
 	
 		// assert new_a equals a
 		if (!Matrix::equal(new_a, mat_a, 0.001)) {
