@@ -1,14 +1,17 @@
 #include "matrix.h"
 #include <Accelerate/Accelerate.h>
 
-// this function multiplies 2 matrices using the Strassen algorithm
-void matmul_strassen(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
-	if (mat_a.rows() == 1) {
+
+ void matmul_strassen_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b,
+        int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int c_i = 0, int c_j = 0, int size = 0) {
+    if (size == 0) {
+		size = mat_a.rows();
+	}
+	if (size == 1) {
 		result.p[0][0] = mat_a.p[0][0] * mat_b.p[0][0];
 		return;
 	}
-	
-	int size = mat_a.rows();
+
 	int split_index = size / 2;
 
 	// Allocate sub-matrices
@@ -82,4 +85,10 @@ void matmul_strassen(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	// Fill the result Matrix with the sub-matrices
 	Matrix::merge_matrix(result, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
 	return;
+ }
+
+
+// this function multiplies 2 matrices using the Strassen algorithm
+void matmul_strassen(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
+    matmul_strassen_inner(result, mat_a, mat_b, mat_a.rows(), 0, 0);
 }
