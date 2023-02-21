@@ -131,39 +131,23 @@ void matmul_ks_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	Matrix::add_matrix(temp1, b01, b00, -1);
 	matmul_ks(m7, temp0, temp1);
 	
-	// Allocate sub-matrices
-	Matrix result_matrix_00(split_index, split_index);
-	Matrix result_matrix_01(split_index, split_index);
-	Matrix result_matrix_10(split_index, split_index);
-	Matrix result_matrix_11(split_index, split_index);
+	// Calculate the sub-matrices, and fill the result Matrix with the sub-matrices
 
 	// 00
-	//Matrix::add_matrix(result, m4, m5, 1, 0, 0, 0, 0, 0, 0, split_index);
+	Matrix::add_matrix(result, m4, m5, 1, 0, 0, 0, 0, 0, 0, split_index);
 
 	// 01
-	//Matrix::add_matrix(result, m3, m5, 1, 0, 0, 0, 0, 0, split_index, split_index);
-	//Matrix::add_matrix(result, result, m6, -1, 0, 0, 0, 0, 0, split_index, split_index);	
-	//Matrix::add_matrix(result, result, m7, 1, 0, 0, 0, 0, 0, split_index, split_index);
+	Matrix::add_matrix(result, m3, m5, 1, 0, 0, 0, 0, 0, split_index, split_index);
+	Matrix::add_matrix(result, result, m6, -1, 0, split_index, 0, 0, 0, split_index, split_index);	
+	Matrix::add_matrix(result, result, m7, 1, 0, split_index, 0, 0, 0, split_index, split_index);
 
 	// 10
-	//Matrix::add_matrix(result, m2, m7, 1, 0, 0, 0, 0, split_index, 0, split_index);
+	Matrix::add_matrix(result, m2, m7, 1, 0, 0, 0, 0, split_index, 0, split_index);
 
 	// 11
-	//Matrix::add_matrix(result, m1, m6, -1, 0, 0, 0, 0, split_index, split_index, split_index);
-	
-	
-	Matrix::add_matrix(result_matrix_00, m4, m5);
+	Matrix::add_matrix(result, m1, m6, -1, 0, 0, 0, 0, split_index, split_index, split_index);
 
-	Matrix::add_matrix(result_matrix_01, m3, m5);
-	Matrix::add_matrix(result_matrix_01, result_matrix_01, m6, -1);
-	Matrix::add_matrix(result_matrix_01, result_matrix_01, m7);
-
-	Matrix::add_matrix(result_matrix_10, m2, m7);
-
-	Matrix::add_matrix(result_matrix_11, m1, m6, -1);
 	// return to standard base
-	
-	Matrix::merge_matrix(result, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
 	reverse_base_transfer_step(result, split_index);
 
 	return;
