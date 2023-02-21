@@ -64,28 +64,23 @@
 	Matrix::add_matrix(temp1, b00, b01);
 	matmul_strassen(m7, temp0, temp1);
 	
-	// Allocate sub-matrices
-	Matrix result_matrix_00(split_index, split_index);
-	Matrix result_matrix_01(split_index, split_index);
-	Matrix result_matrix_10(split_index, split_index);
-	Matrix result_matrix_11(split_index, split_index);
-
-	// Calculate the sub-matrices
+	// Calculate the sub-matrices, and fill the result Matrix with the sub-matrices
 
     // 00
-    Matrix::add_matrix(result_matrix_00, m5, m4, 1, 0, 0, 0, 0, 0, 0, split_index);
-    Matrix::add_matrix(result_matrix_00, result_matrix_00, m6, 1, 0, 0, 0, 0, 0, 0, split_index);
-	Matrix::add_matrix(result_matrix_00, result_matrix_00, m2, -1, 0, 0, 0, 0, 0, 0, split_index);
+    Matrix::add_matrix(result, m5, m4, 1, 0, 0, 0, 0, 0, 0, split_index);
+    Matrix::add_matrix(result, result, m6, 1, 0, 0, 0, 0, 0, 0, split_index);
+	Matrix::add_matrix(result, result, m2, -1, 0, 0, 0, 0, 0, 0, split_index);
 
-	Matrix::add_matrix(result_matrix_01, m1, m2, 1, 0, 0, 0, 0, 0, 0, split_index);
-	Matrix::add_matrix(result_matrix_10, m3, m4, 1, 0, 0, 0, 0, 0, 0, split_index);
+    // 01
+	Matrix::add_matrix(result, m1, m2, 1, 0, 0, 0, 0, 0, split_index, split_index);
 
-	Matrix::add_matrix(result_matrix_11, m5, m1, 1, 0, 0, 0, 0, 0, 0, split_index);
-	Matrix::add_matrix(result_matrix_11, result_matrix_11, m3, -1, 0, 0, 0, 0, 0, 0, split_index);
-	Matrix::add_matrix(result_matrix_11, result_matrix_11, m7, -1, 0, 0, 0, 0, 0, 0, split_index);
+    // 10
+	Matrix::add_matrix(result, m3, m4, 1, 0, 0, 0, 0, split_index, 0, split_index);
 
-	// Fill the result Matrix with the sub-matrices
-	Matrix::merge_matrix(result, result_matrix_00, result_matrix_01, result_matrix_10, result_matrix_11);
+    // 11
+	Matrix::add_matrix(result, m5, m1, 1, 0, 0, 0, 0, split_index, split_index, split_index);
+	Matrix::add_matrix(result, result, m3, -1, split_index, split_index, 0, 0, split_index, split_index, split_index);
+	Matrix::add_matrix(result, result, m7, -1, split_index, split_index, 0, 0, split_index, split_index, split_index);
 	return;
  }
 
