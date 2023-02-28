@@ -8,7 +8,7 @@
 		size = mat_a.rows();
 	}
 	if (size == 1) {
-		result.p[c_i][c_j] = mat_a.p[a_i][a_j] * mat_b.p[b_i][b_j];
+		result(c_i, c_j) = mat_a(a_i, a_j) * mat_b(b_i, b_j);
 		return;
 	}
 

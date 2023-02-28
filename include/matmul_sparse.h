@@ -1,6 +1,6 @@
 // header guard
-#ifndef MATMUL_KS_H
-#define MATMUL_KS_H
+#ifndef MATMUL_SPARSE_H
+#define MATMUL_SPARSE_H
 
 #include <iostream>
 #include "matrix.h"

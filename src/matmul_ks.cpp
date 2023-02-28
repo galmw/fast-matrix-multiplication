@@ -77,7 +77,8 @@ void matmul_ks_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	}
 
 	if (col_1 == 1) {
-		result.p[0][0] = mat_a.p[0][0] * mat_b.p[0][0];
+		result(0,0) = mat_a(0,0) * mat_b(0,0);
+		// result.p[0][0] = mat_a.p[0][0] * mat_b.p[0][0];
 		return;
 	}
 
@@ -162,7 +163,7 @@ void matmul_ks(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	}
 
 	// try some shit
-	if (mat_a.rows() >= 2) {
+	if (mat_a.rows() == -1) {
 		Matrix new_a(mat_a);
 		Matrix new_b(mat_b);
 	

@@ -46,11 +46,6 @@ class Matrix {
         friend void matmul_ks(Matrix&, Matrix&, Matrix&);
 
     private:
-        friend void matmul_strassen_inner(Matrix &result, Matrix& mat_a, Matrix &mat_b, 
-            int a_i, int a_j, int b_i, int b_j, int c_i, int c_j, int size);
-;
-        friend void matmul_ks_inner(Matrix&, Matrix&, Matrix&);
-
         int rows_, cols_;
         double **p;
         double *arr;
