@@ -14,6 +14,7 @@ class Matrix {
     public:
         Matrix(int, int);
         Matrix(const Matrix&);
+        Matrix(const Matrix&, int, int, int, int);
         ~Matrix();
         void print();
         //Matrix(const Matrix&);
@@ -35,8 +36,6 @@ class Matrix {
         static Matrix create_random(int, int);
         static bool equal(Matrix&, Matrix&, double eps=EPS);
         static double diff(Matrix&, Matrix&);
-        static void split_matrix(Matrix&, Matrix&, Matrix&, Matrix&, Matrix&, int);
-        static void merge_matrix(Matrix &result, Matrix &a00, Matrix &a01, Matrix &a10, Matrix &a11);
         static void add_matrix(Matrix &result, Matrix& matrix_a, Matrix &matrix_b, int multiplier = 1,
 				int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int c_i = 0, int c_j = 0, int size = 0);
 

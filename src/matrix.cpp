@@ -28,6 +28,19 @@ Matrix::Matrix(const Matrix& mat) {
     }
 }
 
+// Create a new matrix from a submatrix of the given matrix, starting at (i,j) and with the given size
+// TODO - rework into a submatrix which does not allocate any new memory.
+Matrix::Matrix(const Matrix& mat, int start_i, int start_j, int rows, int cols) {
+    rows_ = rows;
+    cols_ = cols;
+    allocSpace();
+    for (int i = 0; i < rows_; ++i) {
+        for (int j = 0; j < cols_; ++j) {
+            p[i][j] = mat.p[start_i + i][start_j + j];
+        }
+    }
+}
+
 Matrix::~Matrix() {
     delete[] arr;
     delete[] p;
@@ -58,20 +71,6 @@ Matrix Matrix::create_random(int m, int n) {
 		}
 	}
 	return result;
-}
-
-// this function receives a Matrix and splits it into 4 sub-matrices: a00, a01, a10, a11
-void Matrix::split_matrix(Matrix &mat, Matrix &a00, Matrix &a01, Matrix &a10, Matrix &a11, int orig_size) {
-	int size = orig_size / 2;
-
-	for (auto i = 0; i < size; i++) {
-		for (auto j = 0; j < size; j++) {
-			a00.p[i][j] = mat.p[i][j];
-			a01.p[i][j] = mat.p[i][j + size];
-			a10.p[i][j] = mat.p[i + size][j];
-			a11.p[i][j] = mat.p[i + size][j + size];
-		}
-	}
 }
 
 /* PRIVATE HELPER FUNCTIONS
@@ -105,21 +104,6 @@ void Matrix::add_matrix(Matrix &result, Matrix& matrix_a, Matrix &matrix_b, int 
 	for (auto i = 0; i < size; i++) {
 		for (auto j = 0; j < size; j++) {
 			result.p[c_i + i][c_j + j] = matrix_a.p[a_i + i][a_j + j] + (multiplier * matrix_b.p[b_i + i][b_j + j]);
-		}
-	}
-}
-
-// this function recieves 4 sub-matrices and returns a Matrix
-void Matrix::merge_matrix(Matrix &result, Matrix &a00, Matrix &a01, Matrix &a10, Matrix &a11) {
-    int size = a00.rows();
-
-    // Fill the result Matrix with the sub-matrices
-	for (auto i = 0; i < size; i++) {
-		for (auto j = 0; j < size; j++) {
-			result.p[i][j] = a00.p[i][j];
-			result.p[i][j + size] = a01.p[i][j];
-			result.p[size + i][j] = a10.p[i][j];
-			result.p[i + size][j + size] = a11.p[i][j];
 		}
 	}
 }

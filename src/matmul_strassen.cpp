@@ -15,18 +15,15 @@
 	int split_index = size / 2;
 
 	// Allocate sub-matrices
-	Matrix a00(split_index, split_index);
-	Matrix a01(split_index, split_index);
-	Matrix a10(split_index, split_index);
-	Matrix a11(split_index, split_index);
-	Matrix b00(split_index, split_index);
-	Matrix b01(split_index, split_index);
-	Matrix b10(split_index, split_index);
-	Matrix b11(split_index, split_index);
+	Matrix a00(mat_a, 0, 0, split_index, split_index);
+	Matrix a01(mat_a, 0, split_index, split_index, split_index);
+	Matrix a10(mat_a, split_index, 0, split_index, split_index);
+	Matrix a11(mat_a, split_index, split_index, split_index, split_index);
 
-	// Splitting matrices A and B into 4 sub-matrices
-	Matrix::split_matrix(mat_a, a00, a01, a10, a11, size);
-	Matrix::split_matrix(mat_b, b00, b01, b10, b11, size);
+	Matrix b00(mat_b, 0, 0, split_index, split_index);
+	Matrix b01(mat_b, 0, split_index, split_index, split_index);
+	Matrix b10(mat_b, split_index, 0, split_index, split_index);
+	Matrix b11(mat_b, split_index, split_index, split_index, split_index);
 
 	// Allocate sub-matrices
 	Matrix m1(split_index, split_index);
