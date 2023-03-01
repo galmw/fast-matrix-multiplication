@@ -14,10 +14,11 @@ using namespace std;
 
 #define COLUMN_WIDTH 	 (16)
 #define NUM_ITERATIONS	 (8)
-#define PRINT_MATRICES	 (false)
+#define PRINT_MATRICES	 (true)
 
 
 // this function receives a matrix, an matmul_algorithm, and a pointer to a time variable and return the output matrix
+// TODO - add 'const' to the input matrices of each algorithm.
 Matrix run_algorithm(Matrix &mat_a, Matrix &mat_b, void (*matmul_algorithm)(Matrix &, Matrix &, Matrix &), double *time_taken) {
 	Matrix result(mat_a.rows(), mat_b.cols());
 	clock_t start = clock();
@@ -132,9 +133,9 @@ int main() {
 			  << setw(COLUMN_WIDTH) << "  Sparse N.Err" << std::endl;
 
 	
-	for (auto i = 1; i < 2; ++i) {
-		std::cout << setw(COLUMN_WIDTH) << ((int)pow(3, i))
-				  << setw(COLUMN_WIDTH) << dgemm_times[i] << setprecision(5)
+	for (auto i = 0; i < 1; ++i) {
+		std::cout << setw(COLUMN_WIDTH) << ((int)pow(3, i + 1))
+				  << setw(COLUMN_WIDTH) << sparse_times[i] << setprecision(5)
 				  << setw(COLUMN_WIDTH) << sparse_numerical_error[i] << setprecision(5) << std::endl;
 	}
 

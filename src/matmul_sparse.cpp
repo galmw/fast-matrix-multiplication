@@ -78,10 +78,8 @@ int tau_matrix[21][9] = {
 };
 
 int u_multiply[23] = {0, 1, 2, 3, 4, 5, 6, 1, 13, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-int u_sign[23]	   = {1, 1, 1, 1, 1, 1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-
 int v_multiply[23] = {19, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-int v_sign[23]     = {-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+int w_add[23] = {0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 19, 13, 14, 15, 16, 17, 18, 19, 20};
 
 void base_transfer(Matrix &mat, Matrix &result) {
 
@@ -145,6 +143,29 @@ void base_dim_transfer_step(Matrix &mat, int size, int transfer_matrix[21][9]) {
 	}
 }
 
+// this function receives a Matrix in the transfered basis, 3n * 7n is allocated, the full size is 3n * 7n,
+// allocated in the powers of 3, and transfers it into a matrix in the original dimension.
+// It performs one step of the base transfer, for the submatrix staring in (i,j), of square size 'size'.
+// The minimum expected 'size' is 3.
+void base_dim_reverse_transfer_step(Matrix &transfered, Matrix &mat, int size) {
+	int subsize = size / 3;
+
+	// do the base transfer from orig to mat8
+	int trans_i, trans_j, target_i, target_j;
+
+	for (int target_index = 0; target_index < 9; target_index++) {	
+		get3_2d_index(target_index, target_i, target_j);
+		// for each entry in the target matrix, add the appropriate submatrices from the original matrix
+		for (int trans_index = 0; trans_index < 21; trans_index++) {		
+			if (tau_matrix[target_index][trans_index] != 0) {
+				get7_2d_index(trans_index, trans_i, trans_j);
+				Matrix::add_matrix(mat, mat, transfered, tau_matrix[trans_index][target_index],
+					target_i * subsize, target_j * subsize, trans_i * subsize, trans_j * subsize, target_i * subsize, target_j * subsize, subsize);
+			}
+		}
+	}
+}
+
 void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	int size = mat_a.rows();
 
@@ -166,12 +187,32 @@ void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	for (int i = 0; i < 23; i++) {
 		get7_2d_index(u_multiply[i], a_i, a_j);
 		get7_2d_index(v_multiply[i], b_i, b_j);
-		matmul_sparse_inner(*matrices[i], mat_a, mat_b);
+		// take the appropriate submatrices according to u_multiply and v_multiply
+		Matrix sub_a(mat_a, a_i * split_index, a_j * split_index, split_index, split_index);
+		Matrix sub_b(mat_b, b_i * split_index, b_j * split_index, split_index, split_index);
+
+		if (i == 7 || i == 8) {
+			// assuming matrices[i] is zerod out, reverse the sign of sub_a
+			Matrix::add_matrix(*matrices[i], *matrices[i], sub_a, -1);
+			matmul_sparse_inner(*matrices[i], *matrices[i], sub_b);
+		}
+		else if (i == 1) {
+			// assuming matrices[i] is zerod out, reverse the sign of sub_b
+			Matrix::add_matrix(*matrices[i], *matrices[i], sub_b, -1);
+			matmul_sparse_inner(*matrices[i], sub_a, *matrices[i]);
+		}
+		else {
+			// easy case:
+			matmul_sparse_inner(*matrices[i], sub_a, sub_b);
+		}
 	}
 	
-
-	//Matrix::add_matrix(m1, )
-	//matmul_sparse_inner(m1, mat_a, mat_b, a_i, a_j, b_i, b_j, 0, 0, split_index, split_index, split_index);
+	// now we have 23 matrices, we need to add them together to the right submatrices of result
+	int res_i, res_j;
+	for (int i = 0; i < 23; ++i) {
+		get7_2d_index(w_add[i], res_i, res_j);
+		Matrix::add_matrix(result, result, *matrices[i], 1, res_i * split_index, res_j * split_index, 0, 0, res_i * split_index, res_j * split_index, split_index);
+	}
 	return;
 }
 
@@ -202,17 +243,19 @@ void matmul_sparse(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 		}
 	}
 
-	// this should be a different thansfer for a and b.
+	// this should be a different transfer for a and b.
 	base_dim_transfer_step(new_a, mat_a.rows(), phi_matrix);
 	base_dim_transfer_step(new_b, mat_b.rows(), psi_matrix);
 	//base_transfer(mat_a, new_a);
 	//base_transfer(mat_b, new_b);
 	//base_transfer_recursive(new_a, log3);
 	//// base_transfer_recursive(new_b, log3);
+	Matrix transfered_result(new_a.rows(), new_a.cols());
 
-	matmul_sparse_inner(result, mat_a, mat_b);
+	matmul_sparse_inner(transfered_result, mat_a, mat_b);
 
-	
+	base_dim_reverse_transfer_step(transfered_result, result, mat_a.rows());
+
 	// reverse_base_transfer_recursive(result, log3);
 
 }
