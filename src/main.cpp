@@ -113,6 +113,7 @@ int main() {
 
 		Matrix result_sparse = run_algorithm(matrix_a, matrix_b, matmul_sparse, &time_taken);
 		sparse_times.push_back(time_taken);
+		sparse_numerical_error.push_back(Matrix::diff(result_dgemm, result_sparse));
 		
 		if (!Matrix::equal(result_dgemm, result_sparse)) {
 			std::cout << "Something went wrong - The results are not equal" << std::endl;

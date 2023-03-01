@@ -5,27 +5,76 @@
 
 
 int phi_matrix[21][9] = {
-	{0, -1,  0,  0,  0,  0,  0,  0,  0},
-	{0,  0, -1,  0,  0,  0,  0,  0,  0},
-	{0,  0,  1,  1,  0,  0,  0,  0,  0},
-	{0,  0,  0,  0,  0, -1,  0,  1,  0},
-	{-1, 0, -1,  0,  0,  0, -1,  0,  0},
-	{0,  0,  0,  1, -1,  0,  0,  0,  1},
-	{0,  0,  0,  0,  0,  0,  1,  0,  0},
-	{0,  0, -1, -1,  1,  1,  0,  0,  0},
-	{0,  0,  0,  0,  0,  0,  0,  0, -1},
-	{0,  1,  0, -1,  0,  0,  0,  0,  0},
-	{0,  0,  0, -1,  0, -1,  0,  0, -1},
-	{0,  0,  0,  1, -1,  0,  0, -1,  0},
-	{0,  0,  0,  0,  0, -1, 0,  0,  -1},
-	{1, -1,  0,  0,  0,  0,  0,  0,  0},
-	{0,  0,  0,  0,  0,  0,  0,  1,  0},
-	{0,  0,  0,  1,  0,  0,  0,  0,  0},
-	{1, -1,  0,  0,  0,  0,  1,  0,  0},
-	{0,  0,  0,  1, -1,  0,  0,  0,  0},
-	{-1, 1,  0,  0,  0,  0, -1,  1,  1},
-	{0,  0,  0,  0,  1,  0,  0,  1,  0},
-	{0,  0,  0,  0,  0,  0,  0,  0,  1},
+	{ 0, -1,  0,  0,  0,  0,  0,  0,  0},
+	{ 0,  0, -1,  0,  0,  0,  0,  0,  0},
+	{ 0,  0,  1,  1,  0,  0,  0,  0,  0},
+	{ 0,  0,  0,  0,  0, -1,  0,  1,  0},
+	{-1,  0, -1,  0,  0,  0, -1,  0,  0},
+	{ 0,  0,  0,  1, -1,  0,  0,  0,  1},
+	{ 0,  0,  0,  0,  0,  0,  1,  0,  0},
+	{ 0,  0, -1, -1,  1,  1,  0,  0,  0},
+	{ 0,  0,  0,  0,  0,  0,  0,  0, -1},
+	{ 0,  1,  0, -1,  0,  0,  0,  0,  0},
+	{ 0,  0,  0, -1,  0, -1,  0,  0, -1},
+	{ 0,  0,  0,  1, -1,  0,  0, -1,  0},
+	{ 0,  0,  0,  0,  0, -1, 0,  0,  -1},
+	{ 1, -1,  0,  0,  0,  0,  0,  0,  0},
+	{ 0,  0,  0,  0,  0,  0,  0,  1,  0},
+	{ 0,  0,  0,  1,  0,  0,  0,  0,  0},
+	{ 1, -1,  0,  0,  0,  0,  1,  0,  0},
+	{ 0,  0,  0,  1, -1,  0,  0,  0,  0},
+	{-1,  1,  0,  0,  0,  0, -1,  1,  1},
+	{ 0,  0,  0,  0,  1,  0,  0,  1,  0},
+	{ 0,  0,  0,  0,  0,  0,  0,  0,  1},
+};
+
+int psi_matrix[21][9] = {
+	{ 0,  0,  1,  0,  0,  1,  0,  1, -1},
+	{ 1,  0,  0,  0,  0,  0,  0,  0,  0},
+	{ 0,  0,  1,  0,  0,  1,  0,  0,  0},
+	{ 0,  0,  0,  0,  0, -1,  0,  1,  0},
+	{-1, -1,  1,  0,  0,  0,  0,  0,  0},
+	{ 0,  0, -1,  0,  0, -1,  0,  0,  1},
+	{ 1,  1,  0,  0,  0,  0,  0,  0,  0},
+	{ 0,  0,  0,  0,  0,  0,  0,  1,  0},
+	{ 0,  0,  0,  0,  0, -1,  0,  0,  1},
+	{ 0,  1,  0,  0,  1,  0,  0,  0,  0},
+	{ 0,  0,  0,  0,  0,  0,  0, -1,  1},
+	{ 1,  0,  0,  0, -1,  1,  0,  0,  0},
+	{ 0,  0,  0,  0,  0,  0, -1,  0,  0},
+	{ 1,  0,  0,  0,  0,  0,  0,  0,  0},
+	{ 0,  0,  0,  1,  1, -1,  0,  0,  0},
+	{ 0,  1, -1,  0,  1, -1,  0, -1,  1},
+	{ 1,  1,  0,  0,  0,  1,  0,  0,  0},
+	{ 0,  0,  0,  0, -1,  0,  0,  1,  0},
+	{ 0,  0,  0,  0,  0,  1,  0,  0,  0},
+	{ 1,  0,  0,  1,  0,  0,  0,  0,  0},
+	{ 0,  0,  0,  0,  0, -1,  1,  1,  0}
+};
+
+int tau_matrix[21][9] = {
+	{ 1,  0,  0,  0,  0,  0,  0,  0,  0},
+	{ 0,  1,  0,  0,  1,  1,  0,  0,  0},
+	{ 0,  0,  0,  0,  0,  0,  1, -1,  0},
+	{ 0,  0, -1,  0,  0,  0,  0,  0,  0},
+	{ 0,  0,  0,  1,  0,  1, -1,  1,  0},
+	{ 0,  0, -1,  0,  0,  0,  0,  0,  1},
+	{ 0,  1,  1,  0,  1,  1,  0,  0,  0},
+	{ 0, -1, -1,  0,  0,  0,  0,  1,  1},
+	{ 0,  0,  0,  0,  1,  1,  0,  0,  0},
+	{ 0,  0,  0,  0,  0,  1,  0,  0, -1},
+	{ 0,  1,  0,  0,  0,  0,  0,  0,  0},
+	{ 0,  0,  0,  0,  0, -1,  0,  0,  0},
+	{ 0,  0,  0,  1,  0,  0, -1,  1,  0},
+	{ 1, -1,  0,  0,  0,  0,  0,  0,  0},
+	{ 0,  0,  0, -1,  0,  0,  1,  0,  0},
+	{ 0,  1,  0,  0,  1,  0,  0,  0,  0},
+	{ 0,  0, -1,  0,  0,  0,  0,  1,  1},
+	{ 0,  0,  0, -1,  1,  0,  1, -1,  0},
+	{ 0,  0,  0,  0,  0,  0,  0,  1,  1},
+	{ 0,  0,  0,  1,  0,  0,  0,  0,  0},
+	{ 0,  0,  0, -1,  0,  0,  1,  0,  0},
+
 };
 
 void base_transfer(Matrix &mat, Matrix &result) {
@@ -57,7 +106,7 @@ int get7_1d_index(int i, int j) {
 // this function receives a Matrix in the standard basis, 3n * 3n is allocated, the full size is 3n * 7n., allocated in the powers of 3, and transfers it into a matrix in the new dimension.
 // It performs one step of the base transfer, for the submatrix staring in (i,j), of square size 'size'.
 // The minimum expected 'size' is 3.
-void base_dim_transfer_step(Matrix &mat, int size) {
+void base_dim_transfer_step(Matrix &mat, int size, int transfer_matrix[21][9]) {
 	int subsize = size / 3;
 
 	// orig contains the originial dimension of the content.
@@ -81,20 +130,56 @@ void base_dim_transfer_step(Matrix &mat, int size) {
 		get7_2d_index(target_index, target_i, target_j);
 		// for each entry in the target matrix, add the appropriate submatrices from the original matrix
 		for (int orig_index = 0; orig_index < 9; orig_index++) {		
-			if (phi_matrix[target_index][orig_index] != 0) {
+			if (transfer_matrix[target_index][orig_index] != 0) {
 				get3_2d_index(orig_index, orig_i, orig_j);
-				Matrix::add_matrix(mat, mat, orig, phi_matrix[target_index][orig_index],
+				Matrix::add_matrix(mat, mat, orig, transfer_matrix[target_index][orig_index],
 					target_i * subsize, target_j * subsize, orig_i * subsize, orig_j * subsize, target_i * subsize, target_j * subsize, subsize);
 			}
 		}
 	}
 }
 
-void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b,
-        	int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int c_i = 0, int c_j = 0, int size = 0) {
-    if (size == 0) {
-		size = mat_a.rows();
+void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
+	int size = mat_a.rows();
+
+	if (size == 1) {
+		result(0, 0) = mat_a(0, 0) * mat_b(0, 0);
+		return;
 	}
+
+	int split_index = size / 3;
+	// Allocate 23 matrices named from m1 to m23
+	Matrix m1(split_index, split_index);
+	Matrix m2(split_index, split_index);
+	Matrix m3(split_index, split_index);
+	Matrix m4(split_index, split_index);
+	Matrix m5(split_index, split_index);
+	Matrix m6(split_index, split_index);
+	Matrix m7(split_index, split_index);
+	Matrix m8(split_index, split_index);
+	Matrix m9(split_index, split_index);
+	Matrix m10(split_index, split_index);
+	Matrix m11(split_index, split_index);
+	Matrix m12(split_index, split_index);
+	Matrix m13(split_index, split_index);
+	Matrix m14(split_index, split_index);
+	Matrix m15(split_index, split_index);
+	Matrix m16(split_index, split_index);
+	Matrix m17(split_index, split_index);
+	Matrix m18(split_index, split_index);
+	Matrix m19(split_index, split_index);
+	Matrix m20(split_index, split_index);
+	Matrix m21(split_index, split_index);
+	Matrix m22(split_index, split_index);
+	Matrix m23(split_index, split_index);
+
+	int a_i, a_j, b_i, b_j;
+	get7_2d_index(0, a_i, a_j);
+	get7_2d_index(19, b_i, b_j);
+
+
+	//Matrix::add_matrix(m1, )
+	//matmul_sparse_inner(m1, mat_a, mat_b, a_i, a_j, b_i, b_j, 0, 0, split_index, split_index, split_index);
 	return;
 }
 
@@ -126,8 +211,8 @@ void matmul_sparse(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	}
 
 	// this should be a different thansfer for a and b.
-	base_dim_transfer_step(new_a, mat_a.rows());
-	base_dim_transfer_step(new_b, mat_b.rows());
+	base_dim_transfer_step(new_a, mat_a.rows(), phi_matrix);
+	base_dim_transfer_step(new_b, mat_b.rows(), psi_matrix);
 	//base_transfer(mat_a, new_a);
 	//base_transfer(mat_b, new_b);
 	//base_transfer_recursive(new_a, log3);
