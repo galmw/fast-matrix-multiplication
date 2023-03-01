@@ -14,7 +14,7 @@ using namespace std;
 
 #define COLUMN_WIDTH 	 (16)
 #define NUM_ITERATIONS	 (8)
-#define PRINT_MATRICES	 (true)
+#define PRINT_MATRICES	 (false)
 
 
 // this function receives a matrix, an matmul_algorithm, and a pointer to a time variable and return the output matrix

@@ -77,6 +77,12 @@ int tau_matrix[21][9] = {
 
 };
 
+int u_multiply[23] = {0, 1, 2, 3, 4, 5, 6, 1, 13, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+int u_sign[23]	   = {1, 1, 1, 1, 1, 1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+int v_multiply[23] = {19, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+int v_sign[23]     = {-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+
 void base_transfer(Matrix &mat, Matrix &result) {
 
 }
@@ -148,35 +154,21 @@ void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	}
 
 	int split_index = size / 3;
-	// Allocate 23 matrices named from m1 to m23
-	Matrix m1(split_index, split_index);
-	Matrix m2(split_index, split_index);
-	Matrix m3(split_index, split_index);
-	Matrix m4(split_index, split_index);
-	Matrix m5(split_index, split_index);
-	Matrix m6(split_index, split_index);
-	Matrix m7(split_index, split_index);
-	Matrix m8(split_index, split_index);
-	Matrix m9(split_index, split_index);
-	Matrix m10(split_index, split_index);
-	Matrix m11(split_index, split_index);
-	Matrix m12(split_index, split_index);
-	Matrix m13(split_index, split_index);
-	Matrix m14(split_index, split_index);
-	Matrix m15(split_index, split_index);
-	Matrix m16(split_index, split_index);
-	Matrix m17(split_index, split_index);
-	Matrix m18(split_index, split_index);
-	Matrix m19(split_index, split_index);
-	Matrix m20(split_index, split_index);
-	Matrix m21(split_index, split_index);
-	Matrix m22(split_index, split_index);
-	Matrix m23(split_index, split_index);
 
+	// Allocate 23 matrices in an array
+	Matrix* matrices[23];
+	for (int i = 0; i < 23; i++) {
+		matrices[i] = new Matrix(split_index, split_index);
+	}
+
+	// for each sparse matrix, multiply the appropriate submatrices
 	int a_i, a_j, b_i, b_j;
-	get7_2d_index(0, a_i, a_j);
-	get7_2d_index(19, b_i, b_j);
-
+	for (int i = 0; i < 23; i++) {
+		get7_2d_index(u_multiply[i], a_i, a_j);
+		get7_2d_index(v_multiply[i], b_i, b_j);
+		matmul_sparse_inner(*matrices[i], mat_a, mat_b);
+	}
+	
 
 	//Matrix::add_matrix(m1, )
 	//matmul_sparse_inner(m1, mat_a, mat_b, a_i, a_j, b_i, b_j, 0, 0, split_index, split_index, split_index);

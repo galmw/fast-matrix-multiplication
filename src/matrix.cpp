@@ -5,9 +5,6 @@
 #include <stdexcept>
 #include "matrix.h"
 
-
-#define EPS 1e-10
-
 using std::ostream;  using std::istream;  using std::endl;
 using std::domain_error;
 
@@ -31,9 +28,8 @@ Matrix::Matrix(const Matrix& mat) {
     }
 }
 
-Matrix::~Matrix()
-{
-    delete arr;
+Matrix::~Matrix() {
+    delete[] arr;
     delete[] p;
 }
 
