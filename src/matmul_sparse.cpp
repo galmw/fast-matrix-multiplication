@@ -8,7 +8,7 @@ int phi_matrix[21][9] = {
 	{ 0, -1,  0,  0,  0,  0,  0,  0,  0},
 	{ 0,  0, -1,  0,  0,  0,  0,  0,  0},
 	{ 0,  0,  1,  1,  0,  0,  0,  0,  0},
-	{ 0,  0,  0,  0,  0, -1,  0,  1,  0},
+	{ 0,  0,  0,  1, -1,  0,  1, -1,  0},
 	{-1,  0, -1,  0,  0,  0, -1,  0,  0},
 	{ 0,  0,  0,  1, -1,  0,  0,  0,  1},
 	{ 0,  0,  0,  0,  0,  0,  1,  0,  0},
@@ -128,6 +128,7 @@ void base_dim_transfer_step(Matrix &mat, int size, int transfer_matrix[21][9]) {
 			mat(i, j) = 0;
 		}
 	}
+
 	// do the base transfer from orig to mat8
 	int orig_i, orig_j, target_i, target_j;
 	for (int target_index = 0; target_index < 21; target_index++) {	
@@ -157,7 +158,7 @@ void base_dim_reverse_transfer_step(Matrix &transfered, Matrix &mat, int size) {
 		get3_2d_index(target_index, target_i, target_j);
 		// for each entry in the target matrix, add the appropriate submatrices from the original matrix
 		for (int trans_index = 0; trans_index < 21; trans_index++) {		
-			if (tau_matrix[target_index][trans_index] != 0) {
+			if (tau_matrix[trans_index][target_index] != 0) {
 				get7_2d_index(trans_index, trans_i, trans_j);
 				Matrix::add_matrix(mat, mat, transfered, tau_matrix[trans_index][target_index],
 					target_i * subsize, target_j * subsize, trans_i * subsize, trans_j * subsize, target_i * subsize, target_j * subsize, subsize);
@@ -192,12 +193,12 @@ void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 		Matrix sub_b(mat_b, b_i * split_index, b_j * split_index, split_index, split_index);
 
 		if (i == 7 || i == 8) {
-			// assuming matrices[i] is zerod out, reverse the sign of sub_a
+			// assuming matrices[i] is zeroed out, reverse the sign of sub_a
 			Matrix::add_matrix(*matrices[i], *matrices[i], sub_a, -1);
 			matmul_sparse_inner(*matrices[i], *matrices[i], sub_b);
 		}
-		else if (i == 1) {
-			// assuming matrices[i] is zerod out, reverse the sign of sub_b
+		else if (i == 0) {
+			// assuming matrices[i] is zeroed out, reverse the sign of sub_b
 			Matrix::add_matrix(*matrices[i], *matrices[i], sub_b, -1);
 			matmul_sparse_inner(*matrices[i], sub_a, *matrices[i]);
 		}
@@ -223,17 +224,18 @@ void matmul_sparse(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 		std::cout << "\nError: The matrices must be square\n";
 		return;
 	}
-	int new_size = mat_a.rows();
-	// calculate the log in base 3 of new_size
+	
 	int log3 = 0;
+	// calculate the log in base 3 of new_size
+	int new_size = mat_a.rows();
 	while (new_size > 1) {
 		new_size /= 3;
 		log3++;
 	}
-
+	new_size = (int)pow(7, log3);
 	// create a new matrix who's number of columns is 7 to the power of log3.
-	Matrix new_a(mat_a.rows(), (int)pow(7, log3));
-	Matrix new_b(mat_a.rows(), (int)pow(7, log3));
+	Matrix new_a(mat_a.rows(), new_size);
+	Matrix new_b(mat_a.rows(), new_size);
 
 	// copy the matrices to the new matrices
 	for (int i = 0; i < mat_a.rows(); i++) {
@@ -243,19 +245,15 @@ void matmul_sparse(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 		}
 	}
 
+	// TODO - make the transfers recursive and not just a single step.
+
 	// this should be a different transfer for a and b.
 	base_dim_transfer_step(new_a, mat_a.rows(), phi_matrix);
 	base_dim_transfer_step(new_b, mat_b.rows(), psi_matrix);
-	//base_transfer(mat_a, new_a);
-	//base_transfer(mat_b, new_b);
-	//base_transfer_recursive(new_a, log3);
-	//// base_transfer_recursive(new_b, log3);
+
 	Matrix transfered_result(new_a.rows(), new_a.cols());
 
-	matmul_sparse_inner(transfered_result, mat_a, mat_b);
+	matmul_sparse_inner(transfered_result, new_a, new_b);
 
 	base_dim_reverse_transfer_step(transfered_result, result, mat_a.rows());
-
-	// reverse_base_transfer_recursive(result, log3);
-
 }
