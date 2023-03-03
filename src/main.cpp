@@ -100,7 +100,7 @@ int main() {
 
 	// Part 2 - Sparse matrix multiplication
 
-	for (auto i = 1; i < 2; ++i) {
+	for (auto i = 1; i < 3; ++i) {
 		// set n to be 3 to the power of i
 		int n = (int)pow(3, i);
 
@@ -133,7 +133,7 @@ int main() {
 			  << setw(COLUMN_WIDTH) << "  Sparse N.Err" << std::endl;
 
 	
-	for (auto i = 0; i < 1; ++i) {
+	for (auto i = 0; i < 2; ++i) {
 		std::cout << setw(COLUMN_WIDTH) << ((int)pow(3, i + 1))
 				  << setw(COLUMN_WIDTH) << sparse_times[i] << setprecision(5)
 				  << setw(COLUMN_WIDTH) << sparse_numerical_error[i] << setprecision(5) << std::endl;

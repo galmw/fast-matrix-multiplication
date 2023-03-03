@@ -103,6 +103,16 @@ inline int get7_1d_index(int i, int j) {
 	return i * 7 + j;
 }
 
+int log3(int x) { 
+	int log3 = 0;
+	// calculate the log in base 3 of x
+	int res = x;
+	while (res > 1) {
+		res /= 3;
+		log3++;
+	}
+	return log3;
+}
 
 // this function receives a Matrix in the standard basis, 3n * 3n is allocated, the full size is 3n * 7n., allocated in the powers of 3, and transfers it into a matrix in the new dimension.
 // It performs one step of the base transfer, for the submatrix staring in (i,j), of square size 'size'.
@@ -131,16 +141,20 @@ void base_dim_transfer_step(Matrix &mat, int size, int transfer_matrix[21][9], i
 		}
 	}
 
-	// do the base transfer from orig to mat
+	// do the base transfer from orig to mat.
+	// important - mat's colmuns needs to be filled with the appropiate gaps to allow further recursive calls.
 	int orig_i, orig_j, target_i, target_j;
+	int row_subsize = (int) pow(7, log3(subsize));
 	for (int target_index = 0; target_index < 21; target_index++) {	
 		get7_2d_index(target_index, target_i, target_j);
 		// for each entry in the target matrix, add the appropriate submatrices from the original matrix
+		int dest_i = row + target_i * subsize;
+		int dest_j = col + target_j * row_subsize;
 		for (int orig_index = 0; orig_index < 9; orig_index++) {		
 			if (transfer_matrix[target_index][orig_index] != 0) {
 				get3_2d_index(orig_index, orig_i, orig_j);
 				Matrix::add_matrix(mat, mat, orig, transfer_matrix[target_index][orig_index],
-					row + target_i * subsize, col + target_j * subsize, orig_i * subsize, orig_j * subsize, row + target_i * subsize, col + target_j * subsize, subsize);
+					dest_i, dest_j, orig_i * subsize, orig_j * subsize, dest_i, dest_j, subsize);
 			}
 		}
 	}
@@ -179,13 +193,14 @@ void base_dim_transfer_recursive(Matrix &mat, int size, int transfer_matrix[21][
 	if (size == 3) {
 		return;
 	}
-
-	int split_index = size / 3;
+	/*
+	int subsize = size / 3;
 	for (int i = 0; i < 9; i++) {
 		int i1, j1;
 		get3_2d_index(i, i1, j1);
-		base_dim_transfer_recursive(mat, size / 3, transfer_matrix, i1 * split_index, j1 * split_index);
+		base_dim_transfer_recursive(mat, subsize, transfer_matrix, i1 * subsize, j1 * subsize);
 	}
+	*/
 }
 
 void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
@@ -247,14 +262,8 @@ void matmul_sparse(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 		return;
 	}
 	
-	int log3 = 0;
-	// calculate the log in base 3 of new_size
-	int new_size = mat_a.rows();
-	while (new_size > 1) {
-		new_size /= 3;
-		log3++;
-	}
-	new_size = (int)pow(7, log3);
+	int logsize = log3(mat_a.rows());
+	int new_size = (int)pow(7, logsize);
 	// create a new matrix who's number of columns is 7 to the power of log3.
 	Matrix new_a(mat_a.rows(), new_size);
 	Matrix new_b(mat_a.rows(), new_size);
