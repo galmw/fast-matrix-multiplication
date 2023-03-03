@@ -26,7 +26,6 @@ void reverse_base_transfer_step(Matrix &mat, int size, int i=0, int j=0) {
 	Matrix::add_matrix(mat, mat, mat, -1, i + size, j + size, i + size, j + 0, i + size, j + 0, size);
 }
 
-
 // this function receives a Matrix and recursivly transfers its base, in-place
 void base_transfer_recursive(Matrix &mat, int size, int row=0, int col=0) {
 	if (size == 1) {

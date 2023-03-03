@@ -49,8 +49,12 @@ class Matrix {
 
     private:
         int rows_, cols_;
+      
         double **p;
         double *arr;
+
+        int row_base, col_base; // these can be used to redefine operator()
+        int row_size, col_size; // these can be used to redefine rows() and cols() functions
 
         void allocSpace();
 };
