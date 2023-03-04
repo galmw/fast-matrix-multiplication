@@ -114,6 +114,10 @@ int log3(int x) {
 	return log3;
 }
 
+int pow_3to7(int x) {
+	return (int) pow(7, log3(x));
+}
+
 // this function receives a Matrix in the standard basis, 3n * 3n is allocated, the full size is 3n * 7n., allocated in the powers of 3, and transfers it into a matrix in the new dimension.
 // It performs one step of the base transfer, for the submatrix staring in (i,j), of square size 'size'.
 // The minimum expected 'size' is 3.
@@ -124,19 +128,20 @@ void base_dim_transfer_step(Matrix &mat, int size, int transfer_matrix[21][9], i
 		return;
 	}
 	int subsize = size / 3;
+	int col_subsize = pow_3to7(subsize);
 
 	// orig contains the originial dimension of the content.
 	Matrix orig(size, size);
 
 	// copy the contents of mat into orig
-	for (int i = 0; i < orig.rows(); i++) {
-		for (int j = 0; j < orig.cols(); j++) {
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
 			orig(i, j) = mat(row + i, col + j);
 		}
 	}
-	// clear out the content of mat
-	for (int i = 0; i < mat.rows(); i++) {
-		for (int j = 0; j < mat.cols(); j++) {
+	// clear out the content of the destined part of mat
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < col_subsize * 7; j++) {
 			mat(row + i, col + j) = 0;
 		}
 	}
@@ -144,12 +149,12 @@ void base_dim_transfer_step(Matrix &mat, int size, int transfer_matrix[21][9], i
 	// do the base transfer from orig to mat.
 	// important - mat's colmuns needs to be filled with the appropiate gaps to allow further recursive calls.
 	int orig_i, orig_j, target_i, target_j;
-	int row_subsize = (int) pow(7, log3(subsize));
+
 	for (int target_index = 0; target_index < 21; target_index++) {	
 		get7_2d_index(target_index, target_i, target_j);
 		// for each entry in the target matrix, add the appropriate submatrices from the original matrix
 		int dest_i = row + target_i * subsize;
-		int dest_j = col + target_j * row_subsize;
+		int dest_j = col + target_j *  col_subsize;
 		for (int orig_index = 0; orig_index < 9; orig_index++) {		
 			if (transfer_matrix[target_index][orig_index] != 0) {
 				get3_2d_index(orig_index, orig_i, orig_j);
@@ -193,14 +198,15 @@ void base_dim_transfer_recursive(Matrix &mat, int size, int transfer_matrix[21][
 	if (size == 3) {
 		return;
 	}
-	/*
+	
 	int subsize = size / 3;
-	for (int i = 0; i < 9; i++) {
-		int i1, j1;
-		get3_2d_index(i, i1, j1);
-		base_dim_transfer_recursive(mat, subsize, transfer_matrix, i1 * subsize, j1 * subsize);
+	int col_subsize = pow_3to7(subsize);
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 7; j++) {
+			base_dim_transfer_recursive(mat, subsize, transfer_matrix, i * subsize, j * col_subsize);
+		}
 	}
-	*/
+	
 }
 
 void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
