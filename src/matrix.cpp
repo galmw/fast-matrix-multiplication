@@ -47,6 +47,7 @@ Matrix::~Matrix() {
 }
 
 void Matrix::print() {
+    std::cout << "Matrix of size " << rows_ << "x" << cols_ << ":" << std::endl;
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
             std::cout << p[i][j] << " ";
@@ -64,10 +65,10 @@ Matrix Matrix::create_random(int m, int n) {
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
             // generate a random double uniformly distributed between -1 and 1
-            result.p[i][j] = (double)rand() / (double)RAND_MAX * 2 - 1;
+            //result.p[i][j] = (double)rand() / (double)RAND_MAX * 2 - 1;
 
-            // generate a random integer between -5 and 5. TODO - make this any random double between -1 and 1.
-            //result.p[i][j] = rand() % 11 - 5;
+            // generate a random integer between -1 and 1. TODO - make this any random double between -1 and 1.
+           result.p[i][j] = rand() % 3 - 1;
 		}
 	}
 	return result;
@@ -97,12 +98,15 @@ int Matrix::cols() {
  ********************************/
 
 void Matrix::add_matrix(Matrix &result, Matrix& matrix_a, Matrix &matrix_b, int multiplier,
-				int a_i, int a_j, int b_i, int b_j, int c_i, int c_j, int size) {
+				int a_i, int a_j, int b_i, int b_j, int c_i, int c_j, int size, int col_size) {
     if (size == 0) {
 		size = matrix_a.rows();
 	}
+    if (col_size == 0 ) {
+        col_size = size;
+    }
 	for (auto i = 0; i < size; i++) {
-		for (auto j = 0; j < size; j++) {
+		for (auto j = 0; j < col_size; j++) {
 			result.p[c_i + i][c_j + j] = matrix_a.p[a_i + i][a_j + j] + (multiplier * matrix_b.p[b_i + i][b_j + j]);
 		}
 	}

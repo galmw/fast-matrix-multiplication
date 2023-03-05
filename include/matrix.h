@@ -37,7 +37,7 @@ class Matrix {
         static bool equal(Matrix&, Matrix&, double eps=EPS);
         static double diff(Matrix&, Matrix&);
         static void add_matrix(Matrix &result, Matrix& matrix_a, Matrix &matrix_b, int multiplier = 1,
-				int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int c_i = 0, int c_j = 0, int size = 0);
+				int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int c_i = 0, int c_j = 0, int size = 0, int col_size = 0);
 
         int rows();
         int cols();
