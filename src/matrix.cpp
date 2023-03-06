@@ -11,8 +11,34 @@ using std::domain_error;
 /* PUBLIC MEMBER FUNCTIONS
  ********************************/
 
-Matrix::Matrix(int rows, int cols) : rows_(rows), cols_(cols)
-{
+Submatrix::Submatrix() {
+    rows_ = 0;
+    cols_ = 0;
+    p = NULL;
+    arr = NULL;
+    row_base = 0;
+    col_base = 0;
+}
+
+Submatrix::Submatrix(Submatrix& mat, int start_i, int start_j, int rows, int cols) {
+    p = mat.p;
+    rows_ = rows;
+    cols_ = cols;
+    row_base = start_i;
+    col_base = start_j;
+    /*
+    p = mat.p + start_i;
+    for (int i = 0; i < rows_; ++i) {
+        p[i] += start_j;
+    }
+    */
+}
+
+Matrix::Matrix(int rows, int cols) {
+    rows_ = rows;
+    cols_ = cols;
+    row_base = 0;
+    col_base = 0;
     allocSpace();
 }
 
@@ -28,8 +54,7 @@ Matrix::Matrix(const Matrix& mat) {
     }
 }
 
-// Create a new matrix from a submatrix of the given matrix, starting at (i,j) and with the given size
-// TODO - rework into a submatrix which does not allocate any new memory.
+// Allocate a new matrix from a submatrix of the given matrix, starting at (i,j) and with the given size
 Matrix::Matrix(const Matrix& mat, int start_i, int start_j, int rows, int cols) {
     rows_ = rows;
     cols_ = cols;
@@ -46,11 +71,11 @@ Matrix::~Matrix() {
     delete[] p;
 }
 
-void Matrix::print() {
+void Submatrix::print() {
     std::cout << "Matrix of size " << rows_ << "x" << cols_ << ":" << std::endl;
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            std::cout << p[i][j] << " ";
+            std::cout << (*this)(i, j) << " ";
         }
         std::cout << std::endl;
     }
@@ -86,18 +111,18 @@ void Matrix::allocSpace()
     }
 }
 
-int Matrix::rows() {
+int Submatrix::rows() const {
     return rows_;
 }
 
-int Matrix::cols() {
+int Submatrix::cols() const {
     return cols_;
 }
 
 /* NON-MEMBER FUNCTIONS
  ********************************/
 
-void Matrix::add_matrix(Matrix &result, Matrix& matrix_a, Matrix &matrix_b, int multiplier,
+void Submatrix::add_matrix(Submatrix &result, Submatrix& matrix_a, Submatrix &matrix_b, int multiplier,
 				int a_i, int a_j, int b_i, int b_j, int c_i, int c_j, int size, int col_size) {
     if (size == 0) {
 		size = matrix_a.rows();
@@ -112,23 +137,23 @@ void Matrix::add_matrix(Matrix &result, Matrix& matrix_a, Matrix &matrix_b, int 
 	}
 }
 
-ostream& operator<<(ostream& os, const Matrix& m)
+ostream& operator<<(ostream& os, Submatrix& m)
 {
     for (int i = 0; i < m.rows_; ++i) {
-        os << m.p[i][0];
+        os << m(i, 0);
         for (int j = 1; j < m.cols_; ++j) {
-            os << " " << m.p[i][j];
+            os << " " << m(i, j);
         }
         os << endl;
     }
     return os;
 }
 
-istream& operator>>(istream& is, Matrix& m)
+istream& operator>>(istream& is, Submatrix& m)
 {
     for (int i = 0; i < m.rows_; ++i) {
         for (int j = 0; j < m.cols_; ++j) {
-            is >> m.p[i][j];
+            is >> m(i, j);
         }
     }
     return is;
