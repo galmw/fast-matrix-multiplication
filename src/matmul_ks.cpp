@@ -32,6 +32,9 @@ void base_transfer_recursive(Matrix &mat, int size, int row=0, int col=0) {
 		return;
 	}
 
+	// Perform 1 step of the base transfer
+	base_transfer_step(mat, size / 2, row, col);
+
 	if (size > 2) {
 		// Recursively call the function on the 4 submatrices
 		base_transfer_recursive(mat, size / 2, row + 0, col + size / 2);
@@ -39,10 +42,6 @@ void base_transfer_recursive(Matrix &mat, int size, int row=0, int col=0) {
 		base_transfer_recursive(mat, size / 2, row + size / 2, col + size / 2);
 		base_transfer_recursive(mat, size / 2, row + 0, col + 0);
 	}
-
-	// Perform 1 step of the base transfer
-	base_transfer_step(mat, size / 2, row, col);
-
 }
 
 // this function receives a Matrix and recursivly reverse transfers its base, in-place

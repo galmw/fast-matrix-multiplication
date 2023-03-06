@@ -105,9 +105,25 @@ int main() {
 		int n = (int)pow(3, i);
 
 		std::cout << "Testing with matrix size: " << n << std::endl;
-		
 		Matrix matrix_a = Matrix::create_random(n, n);
 		Matrix matrix_b = Matrix::create_random(n, n);
+
+		if (n == 9) {
+			// debug - change to identity matrices
+
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					if (i == j) {
+						matrix_a(i, j) = 1;
+						matrix_b(i, j) = 1;
+					} else {
+						matrix_a(i, j) = 0;
+						matrix_b(i, j) = 0;
+					}
+				}
+			}
+		}
+		
 		// measure the time of the standard matrix multiplication
 		
 		Matrix result_dgemm = run_algorithm(matrix_a, matrix_b, matmul_dgemm, &time_taken);
