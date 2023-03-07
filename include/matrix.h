@@ -17,11 +17,12 @@ class Submatrix {
 
         void print();
 
-        inline double& operator()(int x, int y) { return p[x][y]; }
+        inline double& operator()(int x, int y) { return p[row_base_ + x][col_base_ + y]; }
 
         friend std::ostream& operator<<(std::ostream&, Submatrix&);
         friend std::istream& operator>>(std::istream&, Submatrix&);
 
+        //static void add_matrix(Submatrix &result, Submatrix& matrix_a, Submatrix &matrix_b, int multiplier = 1);
         static void add_matrix(Submatrix &result, Submatrix& matrix_a, Submatrix &matrix_b, int multiplier = 1,
 				int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int c_i = 0, int c_j = 0, int size = 0, int col_size = 0);
 
@@ -35,14 +36,14 @@ class Submatrix {
         double *arr;
 
         // these define where the submatrix starts in the parent matrix
-        int row_base, col_base; 
+        int row_base_, col_base_; 
 };
 
 class Matrix : public Submatrix {
     public:
         Matrix(int, int);
         Matrix(const Matrix&);
-        Matrix(const Matrix&, int, int, int, int);
+        Matrix(Submatrix&, int, int, int, int);
         ~Matrix();
 
         static Matrix create_random(int, int);

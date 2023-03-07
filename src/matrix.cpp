@@ -16,16 +16,16 @@ Submatrix::Submatrix() {
     cols_ = 0;
     p = NULL;
     arr = NULL;
-    row_base = 0;
-    col_base = 0;
+    row_base_ = 0;
+    col_base_ = 0;
 }
 
-Submatrix::Submatrix(Submatrix& mat, int start_i, int start_j, int rows, int cols) {
+Submatrix::Submatrix(Submatrix& mat, int row_base, int col_base, int rows, int cols) {
     p = mat.p;
+    row_base_ = mat.row_base_ + row_base;
+    col_base_ = mat.col_base_ + col_base;
     rows_ = rows;
     cols_ = cols;
-    row_base = start_i;
-    col_base = start_j;
     /*
     p = mat.p + start_i;
     for (int i = 0; i < rows_; ++i) {
@@ -37,8 +37,8 @@ Submatrix::Submatrix(Submatrix& mat, int start_i, int start_j, int rows, int col
 Matrix::Matrix(int rows, int cols) {
     rows_ = rows;
     cols_ = cols;
-    row_base = 0;
-    col_base = 0;
+    row_base_ = 0;
+    col_base_ = 0;
     allocSpace();
 }
 
@@ -55,13 +55,15 @@ Matrix::Matrix(const Matrix& mat) {
 }
 
 // Allocate a new matrix from a submatrix of the given matrix, starting at (i,j) and with the given size
-Matrix::Matrix(const Matrix& mat, int start_i, int start_j, int rows, int cols) {
+Matrix::Matrix(Submatrix& mat, int start_i, int start_j, int rows, int cols) {
     rows_ = rows;
     cols_ = cols;
+    row_base_ = 0;
+    col_base_ = 0;
     allocSpace();
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            p[i][j] = mat.p[start_i + i][start_j + j];
+            p[i][j] = mat(start_i + i, start_j + j);
         }
     }
 }
@@ -122,6 +124,18 @@ int Submatrix::cols() const {
 /* NON-MEMBER FUNCTIONS
  ********************************/
 
+// void Submatrix::add_matrix(Submatrix &result, Submatrix& matrix_a, Submatrix &matrix_b, int multiplier) {
+//     int size = matrix_a.rows();
+//     int col_size = matrix_a.cols();
+
+// 	for (auto i = 0; i < size; i++) {
+// 		for (auto j = 0; j < col_size; j++) {
+// 			result(i, j) = matrix_a(i, j) + (multiplier * matrix_b(i, j));
+// 		}
+// 	}
+// }
+
+
 void Submatrix::add_matrix(Submatrix &result, Submatrix& matrix_a, Submatrix &matrix_b, int multiplier,
 				int a_i, int a_j, int b_i, int b_j, int c_i, int c_j, int size, int col_size) {
     if (size == 0) {
@@ -132,7 +146,7 @@ void Submatrix::add_matrix(Submatrix &result, Submatrix& matrix_a, Submatrix &ma
     }
 	for (auto i = 0; i < size; i++) {
 		for (auto j = 0; j < col_size; j++) {
-			result.p[c_i + i][c_j + j] = matrix_a.p[a_i + i][a_j + j] + (multiplier * matrix_b.p[b_i + i][b_j + j]);
+			result(c_i + i, c_j + j) = matrix_a(a_i + i, a_j + j) + (multiplier * matrix_b(b_i + i, b_j + j));
 		}
 	}
 }

@@ -2,7 +2,7 @@
 #include <Accelerate/Accelerate.h>
 
 
- void matmul_strassen_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b,
+ void matmul_strassen_inner(Submatrix &result, Submatrix &mat_a, Submatrix &mat_b,
         int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int c_i = 0, int c_j = 0, int size = 0) {
     if (size == 0) {
 		size = mat_a.rows();
@@ -15,15 +15,15 @@
 	int split_index = size / 2;
 
 	// Allocate sub-matrices
-	Matrix a00(mat_a, 0, 0, split_index, split_index);
-	Matrix a01(mat_a, 0, split_index, split_index, split_index);
-	Matrix a10(mat_a, split_index, 0, split_index, split_index);
-	Matrix a11(mat_a, split_index, split_index, split_index, split_index);
+	Submatrix a00(mat_a, 0, 0, split_index, split_index);
+	Submatrix a01(mat_a, 0, split_index, split_index, split_index);
+	Submatrix a10(mat_a, split_index, 0, split_index, split_index);
+	Submatrix a11(mat_a, split_index, split_index, split_index, split_index);
 
-	Matrix b00(mat_b, 0, 0, split_index, split_index);
-	Matrix b01(mat_b, 0, split_index, split_index, split_index);
-	Matrix b10(mat_b, split_index, 0, split_index, split_index);
-	Matrix b11(mat_b, split_index, split_index, split_index, split_index);
+	Submatrix b00(mat_b, 0, 0, split_index, split_index);
+	Submatrix b01(mat_b, 0, split_index, split_index, split_index);
+	Submatrix b10(mat_b, split_index, 0, split_index, split_index);
+	Submatrix b11(mat_b, split_index, split_index, split_index, split_index);
 
 	// Allocate sub-matrices
 	Matrix m1(split_index, split_index);
@@ -36,8 +36,7 @@
 
 	Matrix temp0(split_index, split_index);
 
-    Matrix::add_matrix(m1, mat_b, mat_b, -1, 0, split_index, split_index, split_index, 0, 0, split_index);
-	//Matrix::add_matrix(m1, b01, b11, -1);
+	Matrix::add_matrix(m1, b01, b11, -1);
 	matmul_strassen_inner(m1, a00, m1);
 
 	Matrix::add_matrix(m2, a00, a01);
@@ -62,22 +61,26 @@
 	matmul_strassen_inner(m7, temp0, m7);
 	
 	// Calculate the sub-matrices, and fill the result Matrix with the sub-matrices
+	Submatrix r00(result, 0, 0, split_index, split_index);
+	Submatrix r01(result, 0, split_index, split_index, split_index);
+	Submatrix r10(result, split_index, 0, split_index, split_index);
+	Submatrix r11(result, split_index, split_index, split_index, split_index);
 
     // 00
-    Matrix::add_matrix(result, m5, m4, 1, 0, 0, 0, 0, 0, 0, split_index);
-    Matrix::add_matrix(result, result, m6, 1, 0, 0, 0, 0, 0, 0, split_index);
-	Matrix::add_matrix(result, result, m2, -1, 0, 0, 0, 0, 0, 0, split_index);
+    Matrix::add_matrix(r00, m5, m4);
+    Matrix::add_matrix(r00, r00, m6);
+	Matrix::add_matrix(r00, r00, m2, -1);
 
     // 01
-	Matrix::add_matrix(result, m1, m2, 1, 0, 0, 0, 0, 0, split_index, split_index);
+	Matrix::add_matrix(r01, m1, m2);
 
     // 10
-	Matrix::add_matrix(result, m3, m4, 1, 0, 0, 0, 0, split_index, 0, split_index);
+	Matrix::add_matrix(r10, m3, m4);
 
     // 11
-	Matrix::add_matrix(result, m5, m1, 1, 0, 0, 0, 0, split_index, split_index, split_index);
-	Matrix::add_matrix(result, result, m3, -1, split_index, split_index, 0, 0, split_index, split_index, split_index);
-	Matrix::add_matrix(result, result, m7, -1, split_index, split_index, 0, 0, split_index, split_index, split_index);
+	Matrix::add_matrix(r11, m5, m1);
+	Matrix::add_matrix(r11, r11, m3, -1);
+	Matrix::add_matrix(r11, r11, m7, -1);
 	return;
  }
 

@@ -63,7 +63,7 @@ void reverse_base_transfer_recursive(Matrix &mat, int size, int row=0, int col=0
 }
 
 
-void matmul_ks_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
+void matmul_ks_inner(Submatrix &result, Submatrix &mat_a, Submatrix &mat_b) {
 	int col_1 = mat_a.cols();
 	int row_2 = mat_b.rows();
 
@@ -83,15 +83,15 @@ void matmul_ks_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	int split_index = col_1 / 2;
 
 	// Allocate sub-matrices
-	Matrix a00(mat_a, 0, 0, split_index, split_index);
-	Matrix a01(mat_a, 0, split_index, split_index, split_index);
-	Matrix a10(mat_a, split_index, 0, split_index, split_index);
-	Matrix a11(mat_a, split_index, split_index, split_index, split_index);
+	Submatrix a00(mat_a, 0, 0, split_index, split_index);
+	Submatrix a01(mat_a, 0, split_index, split_index, split_index);
+	Submatrix a10(mat_a, split_index, 0, split_index, split_index);
+	Submatrix a11(mat_a, split_index, split_index, split_index, split_index);
 
-	Matrix b00(mat_b, 0, 0, split_index, split_index);
-	Matrix b01(mat_b, 0, split_index, split_index, split_index);
-	Matrix b10(mat_b, split_index, 0, split_index, split_index);
-	Matrix b11(mat_b, split_index, split_index, split_index, split_index);
+	Submatrix b00(mat_b, 0, 0, split_index, split_index);
+	Submatrix b01(mat_b, 0, split_index, split_index, split_index);
+	Submatrix b10(mat_b, split_index, 0, split_index, split_index);
+	Submatrix b11(mat_b, split_index, split_index, split_index, split_index);
 
 	// Allocate sub-matrices
 	Matrix m1(split_index, split_index);
