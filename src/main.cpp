@@ -13,7 +13,7 @@
 using namespace std;
 
 #define COLUMN_WIDTH 	 (16)
-#define NUM_ITERATIONS	 (8)
+#define NUM_ITERATIONS	 (11)
 #define PRINT_MATRICES	 (true)
 
 

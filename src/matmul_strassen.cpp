@@ -3,11 +3,10 @@
 
 
  void matmul_strassen_inner(Submatrix &result, Submatrix &mat_a, Submatrix &mat_b) {
-    if (size == 0) {
-		size = mat_a.rows();
-	}
+	int size = mat_a.rows();
+
 	if (size == 1) {
-		result(c_i, c_j) = mat_a(a_i, a_j) * mat_b(b_i, b_j);
+		result(0, 0) = mat_a(0, 0) * mat_b(0, 0);
 		return;
 	}
 
