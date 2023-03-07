@@ -19,18 +19,19 @@ void base_transfer_step(Submatrix &mat) {
 }
 
 // this function reverse transfers a Matrix from the alternative base, in-place.
-void reverse_base_transfer_step(Matrix &mat, int size, int i=0, int j=0) {
-	Submatrix a01(mat, i + 0, j + size, size, size);
-	Submatrix a10(mat, i + size, j + 0, size, size);
-	Submatrix a11(mat, i + size, j + size, size, size);
+void reverse_base_transfer_step(Submatrix &mat) {
+	int subsize = mat.rows() / 2;
+	Submatrix a01(mat, 0, subsize, subsize, subsize);
+	Submatrix a10(mat, subsize, 0, subsize, subsize);
+	Submatrix a11(mat, subsize, subsize, subsize, subsize);
 	// step 1
-	Matrix::add_matrix(mat, mat, mat, -1, i + size, j + size, i + 0, j + size, i + size, j + size, size);
+	Matrix::add_matrix(a11, a11, a01, -1);
 	// step 2
-	Matrix::add_matrix(mat, mat, mat, -1, i + 0, j + size, i + size, j + 0, i + 0, j + size, size);
+	Matrix::add_matrix(a01, a01, a10, -1);
 	// step 3
-	Matrix::add_matrix(mat, mat, mat, 1, i + size, j + size, i + size, j + 0, i + size, j + size, size);
+	Matrix::add_matrix(a11, a11, a10);
 	// step 4
-	Matrix::add_matrix(mat, mat, mat, -1, i + size, j + size, i + size, j + 0, i + size, j + 0, size);
+	Matrix::add_matrix(a10, a11, a10, -1);
 }
 
 // this function receives a Matrix and recursivly transfers its base, in-place
@@ -59,20 +60,27 @@ void base_transfer_recursive(Submatrix &mat) {
 }
 
 // this function receives a Matrix and recursivly reverse transfers its base, in-place
-void reverse_base_transfer_recursive(Matrix &mat, int size, int row=0, int col=0) {
+void reverse_base_transfer_recursive(Submatrix &mat) {
+	int size = mat.rows();
 	if (size == 1) {
 		return;
 	}
 	if (size > 2) {
+		int subsize = mat.rows() / 2;
+
+		Submatrix a00(mat, 0, 0, subsize, subsize);
+		Submatrix a01(mat, 0, subsize, subsize,subsize);
+		Submatrix a10(mat, subsize, 0, subsize, subsize);
+		Submatrix a11(mat, subsize, subsize, subsize, subsize);
 		// Recursively call the function on the 4 submatrices
-		reverse_base_transfer_recursive(mat, size / 2, row + 0, col + size / 2);
-		reverse_base_transfer_recursive(mat, size / 2, row + size / 2, col + 0);
-		reverse_base_transfer_recursive(mat, size / 2, row + size / 2, col + size / 2);
-		reverse_base_transfer_recursive(mat, size / 2, row + 0, col +0);
+		reverse_base_transfer_recursive(a00);
+		reverse_base_transfer_recursive(a01);
+		reverse_base_transfer_recursive(a10);
+		reverse_base_transfer_recursive(a11);
 	}
 
 	// Perform 1 step of the reverse base transfer
-	reverse_base_transfer_step(mat, size / 2, row, col);
+	reverse_base_transfer_step(mat);
 
 }
 
@@ -142,8 +150,8 @@ void matmul_ks_inner(Submatrix &result, Submatrix &mat_a, Submatrix &mat_b) {
 	Submatrix r10(result, split_index, 0, split_index, split_index);
 	Submatrix r11(result, split_index, split_index, split_index, split_index);
 
+	// TODO with this new logic we can maybe avoid m1-m7 all together by adding things directly to rXY
 	// 00
-
 	Matrix::add_matrix(r00, m4, m5);
 
 	// 01
@@ -156,7 +164,6 @@ void matmul_ks_inner(Submatrix &result, Submatrix &mat_a, Submatrix &mat_b) {
 
 	// 11
 	Matrix::add_matrix(r11, m1, m6, -1);
-
 	return;
 }
 
@@ -175,5 +182,5 @@ void matmul_ks(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	base_transfer_recursive(new_b);
 		
 	matmul_ks_inner(result, new_a, new_b);
-	reverse_base_transfer_recursive(result, result.rows());
+	reverse_base_transfer_recursive(result);
 }

@@ -3,6 +3,8 @@
  */
 
 #include <stdexcept>
+#include <iostream>
+#include <iomanip>
 #include "matrix.h"
 
 using std::ostream;  using std::istream;  using std::endl;
@@ -77,7 +79,7 @@ void Submatrix::print() {
     std::cout << "Matrix of size " << rows_ << "x" << cols_ << ":" << std::endl;
     for (int i = 0; i < rows_; ++i) {
         for (int j = 0; j < cols_; ++j) {
-            std::cout << (*this)(i, j) << " ";
+            std::cout <<  std::right << std::setw(2) << (*this)(i, j) << " ";
         }
         std::cout << std::endl;
     }
@@ -92,10 +94,10 @@ Matrix Matrix::create_random(int m, int n) {
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
             // generate a random double uniformly distributed between -1 and 1
-            //result.p[i][j] = (double)rand() / (double)RAND_MAX * 2 - 1;
+            result.p[i][j] = (double)rand() / (double)RAND_MAX * 2 - 1;
 
             // generate a random integer between -1 and 1. TODO - make this any random double between -1 and 1.
-           result.p[i][j] = rand() % 3 - 1;
+           // result.p[i][j] = rand() % 3 - 1;
 		}
 	}
 	return result;
@@ -136,17 +138,13 @@ int Submatrix::cols() const {
 // }
 
 
-void Submatrix::add_matrix(Submatrix &result, Submatrix& matrix_a, Submatrix &matrix_b, int multiplier,
-				int a_i, int a_j, int b_i, int b_j, int c_i, int c_j, int size, int col_size) {
-    if (size == 0) {
-		size = matrix_a.rows();
-	}
-    if (col_size == 0 ) {
-        col_size = size;
-    }
+void Submatrix::add_matrix(Submatrix &result, Submatrix& matrix_a, Submatrix &matrix_b, int multiplier) {
+    int size = matrix_a.rows();
+	int col_size = matrix_a.cols();
+
 	for (auto i = 0; i < size; i++) {
 		for (auto j = 0; j < col_size; j++) {
-			result(c_i + i, c_j + j) = matrix_a(a_i + i, a_j + j) + (multiplier * matrix_b(b_i + i, b_j + j));
+			result(i, j) = matrix_a(i, j) + (multiplier * matrix_b(i, j));
 		}
 	}
 }

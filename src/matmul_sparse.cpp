@@ -251,27 +251,35 @@ void matmul_sparse_inner(Submatrix &result, Submatrix &mat_a, Submatrix &mat_b) 
 	Matrix* matrices[23];
 	for (int i = 0; i < 23; i++) {
 		matrices[i] = new Matrix(subsize, col_subsize);
+		Matrix::clear(*matrices[i]);
 	}
 
 	// for each sparse matrix, multiply the appropriate submatrices
 	int a_i, a_j, b_i, b_j;
 	for (int i = 0; i < 23; i++) {
+		// take the appropriate submatrices according to u_multiply and v_multiply
 		get7_2d_index(u_multiply[i], a_i, a_j);
 		get7_2d_index(v_multiply[i], b_i, b_j);
-		// take the appropriate submatrices according to u_multiply and v_multiply
-		// TODO make this part without allocating new memory. possibly by using a constructor for a submatrix that only takes a pointer to the data.
 		Submatrix sub_a(mat_a, a_i * subsize, a_j * col_subsize, subsize, col_subsize);
 		Submatrix sub_b(mat_b, b_i * subsize, b_j * col_subsize, subsize, col_subsize);
 
 		if (i == 7 || i == 8) {
 			// assuming matrices[i] is zeroed out, reverse the sign of sub_a
-			Matrix::add_matrix(*matrices[i], *matrices[i], sub_a, -1);
-			matmul_sparse_inner(*matrices[i], *matrices[i], sub_b);
+			Matrix sub_a_reverse(subsize, col_subsize);
+			Matrix::clear(sub_a_reverse);
+			Matrix::add_matrix(sub_a_reverse, sub_a_reverse, sub_a, -1);
+			matmul_sparse_inner(*matrices[i], sub_a_reverse, sub_b);
+			//Matrix::add_matrix(*matrices[i], *matrices[i], sub_a, -1);
+			//matmul_sparse_inner(*matrices[i], *matrices[i], sub_b);
 		}
 		else if (i == 0) {
 			// assuming matrices[i] is zeroed out, reverse the sign of sub_b
-			Matrix::add_matrix(*matrices[i], *matrices[i], sub_b, -1);
-			matmul_sparse_inner(*matrices[i], sub_a, *matrices[i]);
+			Matrix sub_b_reverse(subsize, col_subsize);
+			Matrix::clear(sub_b_reverse);
+			Matrix::add_matrix(sub_b_reverse, sub_b_reverse, sub_b, -1);
+			//Matrix::add_matrix(*matrices[i], *matrices[i], sub_b, -1);
+			//	matmul_sparse_inner(*matrices[i], sub_a, *matrices[i]);
+			matmul_sparse_inner(*matrices[i], sub_a, sub_b_reverse);
 		}
 		else {
 			// easy case:
@@ -279,11 +287,18 @@ void matmul_sparse_inner(Submatrix &result, Submatrix &mat_a, Submatrix &mat_b) 
 		}
 	}
 	
-	// now we have 23 matrices, we need to add them together to the right submatrices of result
+	// now we have 23 matrices, we need to add them together to the right submatrices of result according to w_add
+	// TODO when thinking about it, each *matrices[i] is added once to some part of result without being changed withim first./
+	// so we can save our result directly to result, and not to a temporary matrix.
 	int res_i, res_j;
 	for (int i = 0; i < 23; ++i) {
 		get7_2d_index(w_add[i], res_i, res_j);
-		Matrix::add_matrix(result, result, *matrices[i], 1, res_i * subsize, res_j * col_subsize, 0, 0, res_i * subsize, res_j * col_subsize, subsize, col_subsize);
+		Submatrix res_submat(result, res_i * subsize, res_j * col_subsize, subsize, col_subsize);
+		Matrix::add_matrix(res_submat, res_submat, *matrices[i]);
+	}
+
+	for (int i = 0; i < 23; ++i) {
+		delete matrices[i];
 	}
 	return;
 }
@@ -314,6 +329,7 @@ void matmul_sparse(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	base_dim_transfer_recursive(new_b, psi_matrix);
 
 	Matrix new_dim_result(new_a.rows(), new_a.cols());
+	Matrix::clear(new_dim_result);
 
 	matmul_sparse_inner(new_dim_result, new_a, new_b);
 

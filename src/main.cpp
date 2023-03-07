@@ -12,10 +12,11 @@
 
 using namespace std;
 
-#define COLUMN_WIDTH 	 (16)
-#define NUM_ITERATIONS	 (7)
-#define PRINT_MATRICES	 (true)
+#define COLUMN_WIDTH 			 (16)
+#define NUM_ITERATIONS			 (8)
+#define PRINT_MATRICES			 (true)
 
+#define NUM_ITERATIONS_POW_3	 (5)
 
 // this function receives a matrix, an matmul_algorithm, and a pointer to a time variable and return the output matrix
 // TODO - add 'const' to the input matrices of each algorithm.
@@ -99,34 +100,20 @@ int main() {
 
 
 	// Part 2 - Sparse matrix multiplication
+	dgemm_times.clear();
 
-	for (auto i = 1; i < 3; ++i) {
+	for (auto i = 1; i < NUM_ITERATIONS_POW_3 + 1; ++i) {
 		// set n to be 3 to the power of i
 		int n = (int)pow(3, i);
 
 		std::cout << "Testing with matrix size: " << n << std::endl;
 		Matrix matrix_a = Matrix::create_random(n, n);
 		Matrix matrix_b = Matrix::create_random(n, n);
-
-		if (n == 9) {
-			// debug - change to identity matrices
-
-			for (int i = 0; i < n; i++) {
-				for (int j = 0; j < n; j++) {
-					if (i == j) {
-						matrix_a(i, j) = 1;
-						matrix_b(i, j) = 1;
-					} else {
-						matrix_a(i, j) = 0;
-						matrix_b(i, j) = 0;
-					}
-				}
-			}
-		}
 		
 		// measure the time of the standard matrix multiplication
 		
 		Matrix result_dgemm = run_algorithm(matrix_a, matrix_b, matmul_dgemm, &time_taken);
+		dgemm_times.push_back(time_taken);
 
 		Matrix result_sparse = run_algorithm(matrix_a, matrix_b, matmul_sparse, &time_taken);
 		sparse_times.push_back(time_taken);
@@ -149,7 +136,7 @@ int main() {
 			  << setw(COLUMN_WIDTH) << "  Sparse N.Err" << std::endl;
 
 	
-	for (auto i = 0; i < 2; ++i) {
+	for (auto i = 0; i < NUM_ITERATIONS_POW_3; ++i) {
 		std::cout << setw(COLUMN_WIDTH) << ((int)pow(3, i + 1))
 				  << setw(COLUMN_WIDTH) << sparse_times[i] << setprecision(5)
 				  << setw(COLUMN_WIDTH) << sparse_numerical_error[i] << setprecision(5) << std::endl;
