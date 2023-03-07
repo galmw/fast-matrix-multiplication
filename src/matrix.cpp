@@ -217,3 +217,30 @@ double Matrix::diff(Matrix &matrix_a, Matrix &matrix_b) {
     }
     return max_diff;
 }
+
+// Copy the contents of a given matrix to another matrix. deault size is the size of the result matrix.
+void Submatrix::copy(Submatrix &result, Submatrix &matrix, int size, int col_size) {
+    if (size == 0) {
+        size = result.rows();
+    }
+    if (col_size == 0 ) {
+        col_size = result.cols();
+    }
+    for (auto i = 0; i < size; i++) {
+        for (auto j = 0; j < col_size; j++) {
+            result(i, j) = matrix(i, j);
+        }
+    }
+}
+
+// Clear the contents of a matrix to zero
+void Submatrix::clear(Submatrix &result) {
+    int size = result.rows();
+    int col_size = result.cols();
+
+    for (auto i = 0; i < size; i++) {
+        for (auto j = 0; j < col_size; j++) {
+            result(i, j) = 0;
+        }
+    }
+}

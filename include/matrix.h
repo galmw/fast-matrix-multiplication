@@ -25,6 +25,8 @@ class Submatrix {
         //static void add_matrix(Submatrix &result, Submatrix& matrix_a, Submatrix &matrix_b, int multiplier = 1);
         static void add_matrix(Submatrix &result, Submatrix& matrix_a, Submatrix &matrix_b, int multiplier = 1,
 				int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int c_i = 0, int c_j = 0, int size = 0, int col_size = 0);
+        static void copy(Submatrix &, Submatrix &, int size=0, int cols_size=0);
+        static void clear(Submatrix &);
 
         int rows() const;
         int cols() const;

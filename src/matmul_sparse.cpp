@@ -122,7 +122,8 @@ int pow_3to7(int x) {
 // It performs one step of the base transfer, for the submatrix staring in (i,j), of square size 'size'.
 // The minimum expected 'size' is 3.
 // TODO - make this so it can also expect just a submatrix.
-void base_dim_transfer_step(Matrix &mat, int size, int transfer_matrix[21][9], int row, int col) {
+void base_dim_transfer_step(Submatrix &mat, int transfer_matrix[21][9]) {
+	int size = mat.rows();
 	if (size < 3) {
 		std::cout << "Error!" << std::endl;
 		return;
@@ -130,21 +131,10 @@ void base_dim_transfer_step(Matrix &mat, int size, int transfer_matrix[21][9], i
 	int subsize = size / 3;
 	int col_subsize = pow_3to7(subsize);
 
-	// orig contains the originial dimension of the content.
+	// Copy the contents of the submatrix into a new matrix, orig
 	Matrix orig(size, size);
-
-	// copy the contents of mat into orig
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			orig(i, j) = mat(row + i, col + j);
-		}
-	}
-	// clear out the content of the destined part of mat
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < col_subsize * 7; j++) {
-			mat(row + i, col + j) = 0;
-		}
-	}
+	Matrix::copy(orig, mat);
+	Matrix::clear(mat);
 
 	// do the base transfer from orig to mat.
 	// important - mat's colmuns needs to be filled with the appropiate gaps to allow further recursive calls.
@@ -152,46 +142,40 @@ void base_dim_transfer_step(Matrix &mat, int size, int transfer_matrix[21][9], i
 
 	for (int target_index = 0; target_index < 21; target_index++) {	
 		get7_2d_index(target_index, target_i, target_j);
+
 		// for each entry in the target matrix, add the appropriate subsize*subsize submatrices from the original matrix
-		int dest_i = row + target_i * subsize;
-		int dest_j = col + target_j *  col_subsize;
-		for (int orig_index = 0; orig_index < 9; orig_index++) {		
+		Submatrix target_submat(mat, target_i * subsize, target_j * col_subsize, subsize, subsize);
+
+		for (int orig_index = 0; orig_index < 9; ++orig_index) {		
 			if (transfer_matrix[target_index][orig_index] != 0) {
 				get3_2d_index(orig_index, orig_i, orig_j);
-				Matrix::add_matrix(mat, mat, orig, transfer_matrix[target_index][orig_index],
-					dest_i, dest_j, orig_i * subsize, orig_j * subsize, dest_i, dest_j, subsize);
+				Submatrix orig_submat(orig, orig_i * subsize, orig_j * subsize, subsize, subsize);
+
+				Matrix::add_matrix(target_submat, target_submat, orig_submat, transfer_matrix[target_index][orig_index]);
 			}
 		}
 	}
 }
 
-// this function receives a Matrix in the transfered basis, 3n * 7n is allocated, the full size is 3n * 7n,
-// allocated in the powers of 3, and transfers it into a matrix in the original dimension.
-// It performs one step of the base transfer, for the submatrix staring in (i,j), of square size 'size'.
+// this function receives a Submatrix in the transfered basis, 3^n * 7^n is allocated.
+// It performs one step of the base transfer, and transfers it into a matrix in the original dimension.
 // The minimum expected 'size' is 3.
-void base_dim_reverse_transfer_step(Matrix &mat, int size, int row, int col) {
+void base_dim_reverse_transfer_step(Submatrix &mat) {
+	int size = mat.rows();
+	int colsize = mat.cols();
 	if (size < 3) {
 		std::cout << "Error!" << std::endl;
 		return;
 	}
 	int subsize = size / 3;
-	int col_subsize = pow_3to7(subsize);
+	int col_subsize = colsize / 7;
 
 	// orig contains the originial dimension of the content.
-	Matrix orig(size, col_subsize * 7);
-
+	Matrix orig(size, colsize);
 	// copy the contents of mat into orig
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < col_subsize * 7; j++) {
-			orig(i, j) = mat(row + i, col + j);
-		}
-	}
+	Submatrix::copy(orig, mat);
 	// clear out the content of the destined part of mat
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < col_subsize * 7; j++) {
-			mat(row + i, col + j) = 0;
-		}
-	}
+	Submatrix::clear(mat);
 
 	// do the base transfer from orig to mat
 	int orig_i, orig_j, target_i, target_j;
@@ -199,15 +183,14 @@ void base_dim_reverse_transfer_step(Matrix &mat, int size, int row, int col) {
 	for (int target_index = 0; target_index < 9; target_index++) {	
 		get3_2d_index(target_index, target_i, target_j);
 
-		int dest_i = row + target_i * subsize;
-		int dest_j = col + target_j * subsize; // bring the columns back together. TODO think about this.
+		Submatrix target_submat(mat, target_i * subsize, target_j * subsize, subsize, subsize);
 
 		// for each entry in the target matrix, add the appropriate subsize*subsize (already reverse transfered to square) submatrices from the original matrix
 		for (int orig_index = 0; orig_index < 21; orig_index++) {		
 			if (tau_matrix[orig_index][target_index] != 0) {
 				get7_2d_index(orig_index, orig_i, orig_j);
-				Matrix::add_matrix(mat, mat, orig, tau_matrix[orig_index][target_index],
-					dest_i, dest_j, orig_i * subsize, orig_j * col_subsize, dest_i, dest_j, subsize);
+				Submatrix orig_submat(orig, orig_i * subsize, orig_j * col_subsize, subsize, subsize);
+				Matrix::add_matrix(target_submat, target_submat, orig_submat, tau_matrix[orig_index][target_index]);
 			}
 		}
 	}
@@ -215,24 +198,27 @@ void base_dim_reverse_transfer_step(Matrix &mat, int size, int row, int col) {
 
 // this function receives a Matrix in the standard basis, 3^n * 3^n is allocated, the full size is 3^n * 7^n,
 // and transfers it recusively into a matrix in the new dimension.
-void base_dim_transfer_recursive(Matrix &mat, int size, int transfer_matrix[21][9], int row=0, int col=0) {
+void base_dim_transfer_recursive(Submatrix &mat, int transfer_matrix[21][9]) {
+	int size = mat.rows();
 	if (size < 3) { 
 		return;
 	}
 
-	base_dim_transfer_step(mat, size, transfer_matrix, row, col);
+	base_dim_transfer_step(mat, transfer_matrix);
 	if (size > 3) {
 		int subsize = size / 3;
 		int col_subsize = pow_3to7(subsize);
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 7; j++) {
-				base_dim_transfer_recursive(mat, subsize, transfer_matrix, i * subsize, j * col_subsize);
+				Submatrix submat(mat, i * subsize, j * col_subsize, subsize, col_subsize);
+				base_dim_transfer_recursive(submat, transfer_matrix);
 			}
 		}
 	}
 }
 
-void base_dim_reverse_transfer_recursive(Matrix &mat, int size, int row=0, int col=0) {
+void base_dim_reverse_transfer_recursive(Submatrix &mat) {
+	int size = mat.rows();
 	if (size < 3) { 
 		return;
 	}
@@ -242,14 +228,15 @@ void base_dim_reverse_transfer_recursive(Matrix &mat, int size, int row=0, int c
 		int col_subsize = pow_3to7(subsize);
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 7; j++) {
-				base_dim_reverse_transfer_recursive(mat, subsize, i * subsize, j * col_subsize);
+				Submatrix submat(mat, i * subsize, j * col_subsize, subsize, col_subsize);
+				base_dim_reverse_transfer_recursive(submat);
 			}
 		}
 	}
-	base_dim_reverse_transfer_step(mat, size, row, col);
+	base_dim_reverse_transfer_step(mat);
 }
 
-void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
+void matmul_sparse_inner(Submatrix &result, Submatrix &mat_a, Submatrix &mat_b) {
 	int size = mat_a.rows();
 
 	if (size == 1) {
@@ -258,8 +245,6 @@ void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	}
 
 	int subsize = size / 3;
-	// TODO make all column references from subsize to col_subsize
-	// TODO!! make sure add_matrix doesn't do stupid stuff with columns.
 	int col_subsize = pow_3to7(subsize);
 
 	// Allocate 23 matrices in an array
@@ -275,17 +260,17 @@ void matmul_sparse_inner(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 		get7_2d_index(v_multiply[i], b_i, b_j);
 		// take the appropriate submatrices according to u_multiply and v_multiply
 		// TODO make this part without allocating new memory. possibly by using a constructor for a submatrix that only takes a pointer to the data.
-		Matrix sub_a(mat_a, a_i * subsize, a_j * col_subsize, subsize, col_subsize);
-		Matrix sub_b(mat_b, b_i * subsize, b_j * col_subsize, subsize, col_subsize);
+		Submatrix sub_a(mat_a, a_i * subsize, a_j * col_subsize, subsize, col_subsize);
+		Submatrix sub_b(mat_b, b_i * subsize, b_j * col_subsize, subsize, col_subsize);
 
 		if (i == 7 || i == 8) {
 			// assuming matrices[i] is zeroed out, reverse the sign of sub_a
-			Matrix::add_matrix(*matrices[i], *matrices[i], sub_a, -1, 0, 0, 0, 0, 0, 0, subsize, col_subsize);
+			Matrix::add_matrix(*matrices[i], *matrices[i], sub_a, -1);
 			matmul_sparse_inner(*matrices[i], *matrices[i], sub_b);
 		}
 		else if (i == 0) {
 			// assuming matrices[i] is zeroed out, reverse the sign of sub_b
-			Matrix::add_matrix(*matrices[i], *matrices[i], sub_b, -1, 0, 0, 0, 0, 0, 0, subsize, col_subsize);
+			Matrix::add_matrix(*matrices[i], *matrices[i], sub_b, -1);
 			matmul_sparse_inner(*matrices[i], sub_a, *matrices[i]);
 		}
 		else {
@@ -317,31 +302,22 @@ void matmul_sparse(Matrix &result, Matrix &mat_a, Matrix &mat_b) {
 	Matrix new_a(mat_a.rows(), new_size);
 	Matrix new_b(mat_a.rows(), new_size);
 
+	Matrix::clear(new_a);
+	Matrix::clear(new_b);
+	
 	// copy the matrices to the new matrices
-	for (int i = 0; i < mat_a.rows(); i++) {
-		for (int j = 0; j < mat_a.cols(); j++) {
-			new_a(i, j) = mat_a(i, j);
-			new_b(i, j) = mat_b(i, j);
-		}
-	}
-
-	// TODO - make the transfers recursive and not just a single step.
+	Matrix::copy(new_a, mat_a, mat_a.rows(), mat_a.cols());
+	Matrix::copy(new_b, mat_b, mat_b.rows(), mat_b.cols());
 
 	// this should be a different transfer for a and b.
-	base_dim_transfer_recursive(new_a, mat_a.rows(), phi_matrix);
-	base_dim_transfer_recursive(new_b, mat_b.rows(), psi_matrix);
+	base_dim_transfer_recursive(new_a, phi_matrix);
+	base_dim_transfer_recursive(new_b, psi_matrix);
 
 	Matrix new_dim_result(new_a.rows(), new_a.cols());
 
 	matmul_sparse_inner(new_dim_result, new_a, new_b);
 
-	// TODO - make the reverse transfer recursive as well.
-	base_dim_reverse_transfer_recursive(new_dim_result, mat_a.rows());
+	base_dim_reverse_transfer_recursive(new_dim_result);
 
-	// copy the result to the result matrix
-	for (int i = 0; i < mat_a.rows(); i++) {
-		for (int j = 0; j < mat_a.cols(); j++) {
-			result(i, j) = new_dim_result(i, j);
-		}
-	}
+	Matrix::copy(result, new_dim_result);
 }
