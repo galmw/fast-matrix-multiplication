@@ -2,8 +2,7 @@
 #include <Accelerate/Accelerate.h>
 
 
- void matmul_strassen_inner(Submatrix &result, Submatrix &mat_a, Submatrix &mat_b,
-        int a_i = 0, int a_j = 0, int b_i = 0, int b_j = 0, int c_i = 0, int c_j = 0, int size = 0) {
+ void matmul_strassen_inner(Submatrix &result, Submatrix &mat_a, Submatrix &mat_b) {
     if (size == 0) {
 		size = mat_a.rows();
 	}
@@ -12,29 +11,29 @@
 		return;
 	}
 
-	int split_index = size / 2;
+	int subsize = size / 2;
 
 	// Allocate sub-matrices
-	Submatrix a00(mat_a, 0, 0, split_index, split_index);
-	Submatrix a01(mat_a, 0, split_index, split_index, split_index);
-	Submatrix a10(mat_a, split_index, 0, split_index, split_index);
-	Submatrix a11(mat_a, split_index, split_index, split_index, split_index);
+	Submatrix a00(mat_a, 0, 0, subsize, subsize);
+	Submatrix a01(mat_a, 0, subsize, subsize, subsize);
+	Submatrix a10(mat_a, subsize, 0, subsize, subsize);
+	Submatrix a11(mat_a, subsize, subsize, subsize, subsize);
 
-	Submatrix b00(mat_b, 0, 0, split_index, split_index);
-	Submatrix b01(mat_b, 0, split_index, split_index, split_index);
-	Submatrix b10(mat_b, split_index, 0, split_index, split_index);
-	Submatrix b11(mat_b, split_index, split_index, split_index, split_index);
+	Submatrix b00(mat_b, 0, 0, subsize, subsize);
+	Submatrix b01(mat_b, 0, subsize, subsize, subsize);
+	Submatrix b10(mat_b, subsize, 0, subsize, subsize);
+	Submatrix b11(mat_b, subsize, subsize, subsize, subsize);
 
 	// Allocate sub-matrices
-	Matrix m1(split_index, split_index);
-	Matrix m2(split_index, split_index);
-	Matrix m3(split_index, split_index);
-	Matrix m4(split_index, split_index);
-	Matrix m5(split_index, split_index);
-	Matrix m6(split_index, split_index);
-	Matrix m7(split_index, split_index);
+	Matrix m1(subsize, subsize);
+	Matrix m2(subsize, subsize);
+	Matrix m3(subsize, subsize);
+	Matrix m4(subsize, subsize);
+	Matrix m5(subsize, subsize);
+	Matrix m6(subsize, subsize);
+	Matrix m7(subsize, subsize);
 
-	Matrix temp0(split_index, split_index);
+	Matrix temp0(subsize, subsize);
 
 	Matrix::add_matrix(m1, b01, b11, -1);
 	matmul_strassen_inner(m1, a00, m1);
@@ -61,10 +60,10 @@
 	matmul_strassen_inner(m7, temp0, m7);
 	
 	// Calculate the sub-matrices, and fill the result Matrix with the sub-matrices
-	Submatrix r00(result, 0, 0, split_index, split_index);
-	Submatrix r01(result, 0, split_index, split_index, split_index);
-	Submatrix r10(result, split_index, 0, split_index, split_index);
-	Submatrix r11(result, split_index, split_index, split_index, split_index);
+	Submatrix r00(result, 0, 0, subsize, subsize);
+	Submatrix r01(result, 0, subsize, subsize, subsize);
+	Submatrix r10(result, subsize, 0, subsize, subsize);
+	Submatrix r11(result, subsize, subsize, subsize, subsize);
 
     // 00
     Matrix::add_matrix(r00, m5, m4);
